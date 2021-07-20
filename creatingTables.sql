@@ -1,16 +1,16 @@
 CREATE TABLE states(
     siedz_wojewodztwa_symbol varchar(10) PRIMARY KEY,
     siedz_wojewodztwa_nazwa varchar(100)
-);
+); --created
 CREATE TABLE countries(
     siedz_kraj_symbol varchar(10) PRIMARY KEY,
     siedz_kraj_nazwa varchar(100)
-);
+); --created
 DROP TABLE counties;
 CREATE TABLE counties(
     siedz_powiat_symbol varchar(10) PRIMARY KEY,
-    siedz_powiat_nazwa varchar(100)
-);
+    siedz_powiat_nazwa varchar(256)
+); -- created
 CREATE TABLE municipalities(
     siedz_gmina_symbol varchar(10) PRIMARY KEY,
     siedz_gmina_nazwa varchar(100)
@@ -195,3 +195,62 @@ CREATE TABLE common_LF(
     CONSTRAINT fk_lokfiz_organRejestrowy FOREIGN KEY (lokfiz_organRejestrowy_Symbol) REFERENCES registration_authorities(organ_rejestrowy_symbol),
     CONSTRAINT fk_lokfiz_rodzajRejestru FOREIGN KEY (lokfiz_rodzajRejestru_Symbol) REFERENCES register_types(rodzajRejestru_Symbol)
 );
+
+CREATE TABLE common_LP(
+    id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    lokpraw_regon varchar(14) NOT NULL,
+    lokpraw_parenRegon varchar(9) NOT NULL,
+    lokpraw_nazwa varchar(256),
+    lokpraw_numerWRejestrzeEwiddencji varchar(10),
+    lokpraw_dataWpisuDoRejestruEwidencji DATE,
+    lokpraw_dataPowstania DATE,
+    lokpraw_dataRozpoczeciaDzialanosci DATE,
+    lokpraw_dataWpisuDoRegon DATE,
+    lokpraw_dataZawieszeniaDzialanosci DATE,
+    lokpraw_dataWznowieniaDzialanosci DATE,
+    lokpraw_dataZaistnieniaZmiany DATE,
+    lokpraw_dataZakonczeniaDzialanosci DATE,
+    lokpraw_dataSkresleniaZRegon DATE,
+    lokpraw_siedzKraj_Symbol varchar(10),
+    lokpraw_siedzWojewodztwo_Symbol varchar(10),
+    lokpraw_siedzPowiat_Symbol varchar(10),
+    lokpraw_siedzGmina_Symbol varchar(10),
+    lokpraw_siedzMiejscowoscPoczty_Symbol varchar(10),
+    lokpraw_siedzMiejscowosc_Symbol varchar(10),
+    lokpraw_siedzUlica_Symbol varchar(10),
+    lokpraw_siedzKodPocztowy varchar(7),
+    lokpraw_siedzNumerNieruchomosci varchar(10),
+    lokpraw_siedzNumerLokalu varchar(10),
+    lokpraw_siedzNietypoweMiejsceLokalizacji varchar(256),
+    lokpraw_formaFinansowania_Symbol varchar(10),
+    lokpraw_organRejestrowy_Symbol varchar(10),
+    lokpraw_rodzajRejestruEwidencji_Symbol varchar(10),
+    CONSTRAINT fk_lokpraw_regon FOREIGN KEY (lokpraw_regon) REFERENCES summary_data(regon),
+    CONSTRAINT fk_lokpraw_parentRegon FOREIGN KEY (lokpraw_parenRegon) REFERENCES common_P(praw_regon),
+    CONSTRAINT fk_lokpraw_siedzKraj_Symbol FOREIGN KEY (lokpraw_siedzKraj_Symbol) REFERENCES countries(siedz_kraj_symbol),
+    CONSTRAINT fk_lokpraw_siedzWojewodztwo_Symbol FOREIGN KEY (lokpraw_siedzWojewodztwo_Symbol) REFERENCES states(siedz_wojewodztwa_symbol),
+    CONSTRAINT fk_lokpraw_siedzPowiat FOREIGN KEY (lokpraw_siedzPowiat_Symbol) REFERENCES counties(siedz_powiat_symbol),
+    CONSTRAINT fk_lokpraw_siedzGmina FOREIGN KEY (lokpraw_siedzGmina_Symbol) REFERENCES municipalities(siedz_gmina_symbol),
+    CONSTRAINT fk_lokpraw_siedzMiejscowosc FOREIGN KEY (lokpraw_siedzMiejscowosc_Symbol) REFERENCES towns(siedz_miejscowosc_symbol),
+    CONSTRAINT fk_lokpraw_ulica FOREIGN KEY (lokpraw_siedzUlica_Symbol) REFERENCES streets(siedz_ulica_symbol),
+    CONSTRAINT fk_lokpraw_FormaFinansowania FOREIGN KEY (lokpraw_formaFinansowania_Symbol) REFERENCES forms_of_financing(forma_finansowania_symbol),
+    CONSTRAINT fk_lokpraw_organRejestrowy FOREIGN KEY (lokpraw_organRejestrowy_Symbol) REFERENCES registration_authorities(organ_rejestrowy_symbol),
+    CONSTRAINT fk_lokpraw_rodzajRejestruEwidencji FOREIGN KEY (lokpraw_rodzajRejestruEwidencji_Symbol) REFERENCES type_of_register_of_records(rodzaj_rejestru_ewidencji_symbol)
+);
+
+CREATE TABLE pkds(
+    pkd_Kod varchar(10) PRIMARY KEY,
+    pkd_Nazwa varchar(256)
+);
+
+
+CREATE TABLE pkd_F_ovnership(
+    fiz_pkd_regon varchar(9) NOT NULL,
+    fiz_pkd_Kod varchar(10),
+    fiz_pkd_Przewazajace INT,
+    fiz_pkd_SilosID INT,
+    CONSTRAINT pk_pkd_F_ovnership PRIMARY KEY (fiz_pkd_regon, fiz_pkd_Kod),
+    CONSTRAINT fk_pkd_Kod FOREIGN KEY (fiz_pkd_Kod) REFERENCES pkds(pkd_Kod),
+    CONSTRAINT fk_silos FOREIGN KEY (fiz_pkd_SilosID) REFERENCES silos(silosID)
+);
+

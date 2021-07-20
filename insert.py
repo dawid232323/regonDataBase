@@ -1,6 +1,16 @@
 import psycopg2
 import traceback
 import csv
+import time
+
+class county_item():
+    def __init__(self, table_row):
+        self.id = table_row[0][0:4]
+        self.name = table_row[2]
+
+    def __str__(self):
+        return "('" + self.id + "','" + self.name +"')"
+
 
 class summary_item():
     def __init__(self, table_row):
@@ -44,19 +54,30 @@ class data_base_connector():
             traceback.print_exc()
         self.file_handler = filer
         
-        
-
     def inserting_summary_data(self):
         for row in self.file_handler.read_rows():
             command = "INSERT INTO summary_data VALUES " + str(summary_item(row))
             print(command)
+    
+    def inserting_counties(self):
+        for row in self.file_handler.read_rows():
+            command = "INSERT INTO counties (siedz_powiat_symbol, siedz_powiat_nazwa) VALUES " + str(county_item(row))
+            if row[0] != 'id':
+                try:
+                    self.cur.execute(command)
+                    self.conn.commit()
+                    print('done')
+                    time.sleep(0.5)
+                except Exception as ex:
+                    print(ex)
+                    self.conn.rollback()
 
 def main():
-    name = 'lublin.csv'   #input('type file name')
+    name = '/Users/dawidpylak/Documents/Projekty Xcode i Inne/Scrapping/county_list.csv'   #input('type file name')
     fHandler = file_handler(name)
     # fHandler.print_rows()
     db = data_base_connector(fHandler)
-    db.inserting_summary_data()
+    db.inserting_counties()
     
     
 
