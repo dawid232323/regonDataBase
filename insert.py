@@ -4,16 +4,71 @@ import csv
 import time
 
 class common_item():
-    def __init__(self, regon, nip, nip_status, regon_wpis, regon_zmiana):
+    def __init__(self, regon, nip, nip_status, regon_wpis, regon_zmiana, regon_skreslenie, podstawowa_forma_prawna, szczegolna_forma_prawna, forma_finansowania, forma_wlasnosci):
         self.regon = regon
         self.nip = nip
         self.status_nip = nip_status
         self.data_wpisu_do_regon = regon_wpis
         self.data_zaistnienia_zmiany = regon_zmiana
+        self.data_skreslenia_z_regon = regon_skreslenie
+        self.podstawowa_forma_prawna = podstawowa_forma_prawna
+        self.szczegolna_forma_prawna = szczegolna_forma_prawna
+        self.forma_finansowania = forma_finansowania
+        self.forma_wlasnosci = forma_wlasnosci
+        
 
 class common_P_item(common_item):
     def __init__(self, table_row):
-        super(common_P_item, self).__init__(table_row[1], table_row[2], table_row[3], table_row[10], table_row[13])
+        super(common_P_item, self).__init__(regon=table_row[1], nip=table_row[2], nip_status=table_row[3], regon_wpis=table_row[9], regon_zmiana=table_row[12], regon_skreslenie=table_row[14], podstawowa_forma_prawna=table_row[40], szczegolna_forma_prawna=table_row[41], forma_finansowania=table_row[42], forma_wlasnosci=table_row[43])
+        self.nazwa = table_row[3]
+        self.skrocona_nazwa = table_row[4]
+        self.numer_w_rejestrze_ewidencji = table_row[5]
+        self.data_wpisu_do_rejestru_ewidencji = table_row[6]
+        self.data_powstania = table_row[7]
+        self.data_rozpoczecia_dzialanosci = table_row[8]
+        self.data_zawieszenia_dzialanosci = table_row[10]
+        self.data_wznowienia_dzialanosci = table_row[11]
+        self.data_zakonczenia_dzialanosci = table_row[13]
+        self.data_orzeczenia_upadlosci = table_row[15]
+        self.data_zakonczenia_post_upadlosciowego = table_row[16]
+        self.kraj_symbol = table_row[17]
+        self.woj_symbol = table_row[18]
+        self.pow_symbol = table_row[19]
+        self.gmin_symbol = table_row[20]
+        self.kod_pocztowy = table_row[21]
+        self.miejscowosc_poczty = table_row[22]
+        self.miejsc_symbol = table_row[23]
+        self.ulica_symbol = table_row[24]
+        self.num_nieruchomosci = table_row[25]
+        self.num_lokalu = table_row[26]
+        self.niet_miejsce_lokalizacji = table_row[27]
+        self.numer_telefonu = table_row[28]
+        self.num_wew_tel = table_row[29]
+        self.num_faksu = table_row[30]
+        self.adres_email = table_row[31]
+        self.strona_internetowa = table_row[32]
+        self.organ_zalozycielski = table_row[44]
+        self.organ_rejestrowy = table_row[45]
+        self.rodzaj_rejestru_ewidencji = table_row[46]
+        self.liczba_jednostek_lokalnych = table_row[54]
+    
+    def __str__(self):
+        return "('"+self.regon + "','" + self.nip + "','" + self.status_nip + "','" + self.nazwa + "','" + self.skrocona_nazwa + "','" + self.numer_w_rejestrze_ewidencji + "','" + self.data_wpisu_do_rejestru_ewidencji + "','" + self.data_powstania + "','" + self.data_rozpoczecia_dzialanosci + "','" + self.data_wpisu_do_regon + "','" + self.data_zawieszenia_dzialanosci + "','" + self.data_wznowienia_dzialanosci + "','" + self.data_zaistnienia_zmiany + "','" + self.data_zakonczenia_dzialanosci + "','" + self.data_skreslenia_z_regon + "','" + self.data_orzeczenia_upadlosci + "','" + self.data_zakonczenia_post_upadlosciowego + "','" + self.kraj_symbol + "','" + self.woj_symbol + "','" + self.pow_symbol + "','" + self.gmin_symbol + "','" + self.kod_pocztowy + "','" + self.miejscowosc_poczty + "','" + self.miejsc_symbol + "','" + self.ulica_symbol + "','" + self.num_nieruchomosci + "','" + self.num_lokalu + "','" + self.niet_miejsce_lokalizacji + "','" + self.numer_telefonu + "','" + self.num_wew_tel + "','" + self.num_faksu + "','" + self.adres_email + "','" + self.strona_internetowa + "','" +self.podstawowa_forma_prawna + "','" + self.szczegolna_forma_prawna + "','" + self.forma_finansowania + "','" + self.forma_wlasnosci + "','" + self.organ_zalozycielski + "','" + self.organ_rejestrowy + "','" + self.rodzaj_rejestru_ewidencji + "'," + self.liczba_jednostek_lokalnych + ")"
+
+class common_F (common_item):
+    def __init__(self, table_row):
+        super(common_P_item, self).__init__(regon=table_row[1], nip=table_row[2], nip_status=table_row[3], regon_wpis=table_row[7], regon_zmiana=table_row[8], regon_skreslenie=table_row[9], podstawowa_forma_prawna=table_row[10], szczegolna_forma_prawna=table_row[11], forma_finansowania=table_row[12], forma_wlasnosci=table_row[13])
+        self.nazwisko = table_row[4]
+        self.imie1 = table_row[5]
+        self.imie2 = table_row[6]
+        self.dzialalnosc_CEIDG = table_row[18]
+        self.dzialalnosc_rolnicza = table_row[19]
+        self.dzialalnosc_pozostala = table_row[20]
+        self.dzialalnosc_skreslona_do_20141108 = table_row[21]
+        self.liczba_jednostek_lokalnych = table_row[22]
+    
+    def __str__(self):
+        return "('" + self.regon + "','" + self.nip + "','" + self.status_nip + "','" + self.nazwisko + "','" + self.imie1
 
 class county_item():
     def __init__(self, table_row):
