@@ -150,7 +150,7 @@ ALTER TABLE summary_data ADD CONSTRAINT regon_len CHECK ( length(regon) > 8 );
 
 CREATE TABLE silos(
     silosID INT PRIMARY KEY,
-    silos_Nazwa varchar(100)
+    silos_Nazwa varchar(256)
 );
 
 CREATE TABLE common_LF(
@@ -246,7 +246,7 @@ CREATE TABLE pkds(
 
 CREATE TABLE pkd_F_ovnership(
     fiz_pkd_regon varchar(9) NOT NULL,
-    fiz_pkd_Kod varchar(10),
+    fiz_pkd_Kod varchar(10) NOT NULL,
     fiz_pkd_Przewazajace INT,
     fiz_pkd_SilosID INT,
     CONSTRAINT pk_pkd_F_ovnership PRIMARY KEY (fiz_pkd_regon, fiz_pkd_Kod),
@@ -254,3 +254,27 @@ CREATE TABLE pkd_F_ovnership(
     CONSTRAINT fk_silos FOREIGN KEY (fiz_pkd_SilosID) REFERENCES silos(silosID)
 );
 
+CREATE TABLE pkd_LF_ownership(
+    lokfiz_pkd_regon varchar(14) NOT NULL,
+    lokfiz_pkd_Kod varchar(10) NOT NULL,
+    lokfiz_pkd_Przewazajace INT,
+    lokfiz_Silos_Symbol varchar(256),
+    CONSTRAINT pk_pkd_LF_ownership PRIMARY KEY (lokfiz_pkd_regon, lokfiz_pkd_Kod),
+    CONSTRAINT fk_pkd_Kod FOREIGN KEY (lokfiz_pkd_Kod) REFERENCES pkds(pkd_Kod)
+);
+
+CREATE TABLE pkd_LP_ownership(
+    lokpraw_pkd_regon varchar(14) NOT NULL,
+    lokpraw_pkdKod varchar(10) NOT NULL,
+    lokpraw_pkdPrzewazajace INT,
+    CONSTRAINT pk_pkd_LP_ownership PRIMARY KEY (lokpraw_pkd_regon, lokpraw_pkdKod),
+    CONSTRAINT fk_lokpraw_pkdKod FOREIGN KEY (lokpraw_pkdKod) REFERENCES pkds(pkd_Kod)
+);
+
+CREATE TABLE pkd_P_ownership(
+    praw_pkd_regon varchar(9) NOT NULL,
+    praw_pkdKod varchar(10) NOT NULL,
+    praw_pkdPrzewazajace INT,
+    CONSTRAINT pk_pkd_P_ownership PRIMARY KEY (praw_pkd_regon, praw_pkdKod),
+    CONSTRAINT fk_praw_pkdKod FOREIGN KEY (praw_pkdKod) REFERENCES pkds(pkd_Kod)
+);

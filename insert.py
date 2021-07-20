@@ -3,6 +3,18 @@ import traceback
 import csv
 import time
 
+class common_item():
+    def __init__(self, regon, nip, nip_status, regon_wpis, regon_zmiana):
+        self.regon = regon
+        self.nip = nip
+        self.status_nip = nip_status
+        self.data_wpisu_do_regon = regon_wpis
+        self.data_zaistnienia_zmiany = regon_zmiana
+
+class common_P_item(common_item):
+    def __init__(self, table_row):
+        super(common_P_item, self).__init__(table_row[1], table_row[2], table_row[3], table_row[10], table_row[13])
+
 class county_item():
     def __init__(self, table_row):
         self.id = table_row[0][0:4]
@@ -10,7 +22,6 @@ class county_item():
 
     def __str__(self):
         return "('" + self.id + "','" + self.name +"')"
-
 
 class summary_item():
     def __init__(self, table_row):
