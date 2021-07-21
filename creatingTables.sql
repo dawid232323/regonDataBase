@@ -14,47 +14,47 @@ CREATE TABLE counties(
 CREATE TABLE municipalities(
     siedz_gmina_symbol varchar(10) PRIMARY KEY,
     siedz_gmina_nazwa varchar(100)
-);
+); -- created
 CREATE TABLE posts(
     siedz_miejscowosc_poczty_symbol varchar(10) PRIMARY KEY,
     siedz_miejscowosc_poczty_nazwa varchar(100)
-);
+); -- created
 CREATE TABLE towns(
     siedz_miejscowosc_symbol varchar(10) PRIMARY KEY,
     siedz_miejscowosc_nazwa varchar(100)
-);
+); -- created
 CREATE TABLE streets(
     siedz_ulica_symbol varchar(10) PRIMARY KEY,
     siedz_ulica_nazwa varchar(100)
-);
+); -- created
 CREATE TABLE basic_legal_form(
     podstawowa_forma_prawna_symbol varchar(10) PRIMARY KEY,
-    podstawowa_forma_prawna_nazwa varchar(100)
-);
+    podstawowa_forma_prawna_nazwa varchar(256)
+); -- created
 CREATE TABLE specific_legal_form(
     szczegolna_forma_prawna_symbol varchar(10) PRIMARY KEY,
-    szeczgolna_forma_prawna_nazwa varchar(100)
-);
+    szeczgolna_forma_prawna_nazwa varchar(256)
+); -- created
 CREATE TABLE forms_of_financing(
     forma_finansowania_symbol varchar(10) PRIMARY KEY,
-    forma_finansowania_nazwa varchar(100)
-);
+    forma_finansowania_nazwa varchar(256)
+); -- created
 CREATE TABLE forms_of_ownership(
     forma_wlasnosci_symbol varchar(10) PRIMARY KEY,
-    forma_wlasnosci_nazwa varchar(100)
-);
+    forma_wlasnosci_nazwa varchar(256)
+); -- created
 CREATE TABLE founding_bodies(
     ogran_zalozycielski_symbol varchar(10) PRIMARY KEY,
-    organ_zalozycielski_nazwa varchar(100)
-);
+    organ_zalozycielski_nazwa varchar(256)
+); -- created
 CREATE TABLE type_of_register_of_records(
     rodzaj_rejestru_ewidencji_symbol varchar(10) PRIMARY KEY,
-    rodzaj_rejestru_ewidencji_nazwa varchar(100)
-);
+    rodzaj_rejestru_ewidencji_nazwa varchar(256)
+); -- created
 CREATE TABLE registration_authorities(
     organ_rejestrowy_symbol varchar(10) PRIMARY KEY,
-    organ_rejestrowy_nazwa varchar(100)
-);
+    organ_rejestrowy_nazwa varchar(256)
+); -- created
 CREATE TABLE common_P(
     id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     praw_regon varchar(14) NOT NULL CHECK ( length(praw_regon) > 8 ),
@@ -104,16 +104,17 @@ CREATE TABLE common_P(
     praw_organRejestrowy_Symbol varchar(10),
     praw_rodzajRejestruEwidencji_SYmbol varchar(10),
     praw_liczbaJednostekLokalnych INT,
+    praw_dataWpisuDoBazyDanych DATE,
     CONSTRAINT fk_podstawowaFormaPrawna_Symbol FOREIGN KEY (praw_podstawowaFormaPrawna_Symbol) REFERENCES basic_legal_form(podstawowa_forma_prawna_symbol),
     CONSTRAINT fk_szczegolnaFormaPrawna_Symbol FOREIGN KEY (praw_szczegolnaFormaPrawna_Symbol) REFERENCES specific_legal_form(szczegolna_forma_prawna_symbol),
     CONSTRAINT fk_formaFinansowania_Symbol FOREIGN KEY (praw_formaFinansowania_Symbol) REFERENCES forms_of_financing(forma_finansowania_symbol),
     CONSTRAINT fk_formaWlasnosci_Symbol FOREIGN KEY (praw_formaWlasnosci_Symbol) REFERENCES forms_of_ownership(forma_wlasnosci_symbol),
     CONSTRAINT fk_organZalozycielski_Symbol FOREIGN KEY (praw_organZalozycielski) REFERENCES founding_bodies(ogran_zalozycielski_symbol),
     CONSTRAINT fk_organRejestrowy_Symbol FOREIGN KEY (praw_organRejestrowy_Symbol) REFERENCES registration_authorities(organ_rejestrowy_symbol),
-    CONSTRAINT fk_rodzajRejestruEwidencji_Symbol FOREIGN KEY (praw_rodzajRejestruEwidencji_SYmbol) REFERENCES type_of_register_of_records(rodzaj_rejestru_ewidencji_symbol),
-    CONSTRAINT fk_regon FOREIGN KEY (praw_regon) REFERENCES summary_data(regon)
+    CONSTRAINT fk_rodzajRejestruEwidencji_Symbol FOREIGN KEY (praw_rodzajRejestruEwidencji_SYmbol) REFERENCES type_of_register_of_records(rodzaj_rejestru_ewidencji_symbol)
+    --CONSTRAINT fk_regon FOREIGN KEY (praw_regon) REFERENCES summary_data(regon)
 );
-DROP TABLE countries, common_P;
+DROP TABLE common_P;
 
 CREATE TABLE common_F(
     id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -135,11 +136,12 @@ CREATE TABLE common_F(
     fiz_dzialanoscPozostala INT,
     fiz_dzialanoscSkreslonaDo20141108 INT CHECK (fiz_dzialanoscSkreslonaDo20141108 IN (0, 1)),
     fiz_liczbaJednLokalnych INT,
+    fiz_dataWpisuDoBazyDanych DATE,
     CONSTRAINT fk_podstawowaFormaPrawna_Symbol FOREIGN KEY (fiz_podstawowaFormaPrawna_Symbol) REFERENCES basic_legal_form(podstawowa_forma_prawna_symbol),
     CONSTRAINT fk_szczegolnaFormaPrawnaSymbol FOREIGN KEY (fiz_szczegolnaFormaPrawna_Symbol) REFERENCES specific_legal_form(szczegolna_forma_prawna_symbol),
     CONSTRAINT fk_formaFinansowania_Symbol FOREIGN KEY (fiz_formaFinansowania_Symbol) REFERENCES forms_of_financing(forma_finansowania_symbol),
-    CONSTRAINT fk_formaWlasnosci_Symbol FOREIGN KEY (fiz_formaWlasnosci_Symbol) REFERENCES forms_of_ownership(forma_wlasnosci_symbol),
-    CONSTRAINT fk_regon FOREIGN KEY (fiz_regon) REFERENCES summary_data(regon)
+    CONSTRAINT fk_formaWlasnosci_Symbol FOREIGN KEY (fiz_formaWlasnosci_Symbol) REFERENCES forms_of_ownership(forma_wlasnosci_symbol)
+    --CONSTRAINT fk_regon FOREIGN KEY (fiz_regon) REFERENCES summary_data(regon)
 );
 
 CREATE TABLE register_types(
@@ -183,6 +185,7 @@ CREATE TABLE common_LF(
     lokfiz_organRejestrowy_Symbol varchar(10),
     lokfiz_rodzajRejestru_Symbol varchar(10),
     lokfizC_niePodjetoDzialanosci varchar(10),
+    lokfiz_dataWpisuDoBazyDanych DATE,
     CONSTRAINT fk_lokfiz_parentRegon FOREIGN KEY (lokfiz_parentRegon) REFERENCES common_F(fiz_regon),
     CONSTRAINT fk_silosID FOREIGN KEY (lokfiz_silosID) REFERENCES silos(silosID),
     CONSTRAINT fk_lokfiz_siedzKraj_Symbol FOREIGN KEY (lofkiz_siedzKraj_Symbol) REFERENCES countries(siedz_kraj_symbol),
@@ -225,6 +228,7 @@ CREATE TABLE common_LP(
     lokpraw_formaFinansowania_Symbol varchar(10),
     lokpraw_organRejestrowy_Symbol varchar(10),
     lokpraw_rodzajRejestruEwidencji_Symbol varchar(10),
+    lokpraw_dataWpisuDoBazyDanych DATE,
     CONSTRAINT fk_lokpraw_regon FOREIGN KEY (lokpraw_regon) REFERENCES summary_data(regon),
     CONSTRAINT fk_lokpraw_parentRegon FOREIGN KEY (lokpraw_parenRegon) REFERENCES common_P(praw_regon),
     CONSTRAINT fk_lokpraw_siedzKraj_Symbol FOREIGN KEY (lokpraw_siedzKraj_Symbol) REFERENCES countries(siedz_kraj_symbol),

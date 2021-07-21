@@ -68,7 +68,19 @@ class common_F (common_item):
         self.liczba_jednostek_lokalnych = table_row[22]
     
     def __str__(self):
-        return "('" + self.regon + "','" + self.nip + "','" + self.status_nip + "','" + self.nazwisko + "','" + self.imie1
+        return "('" + self.regon + "','" + self.nip + "','" + self.status_nip + "','" + self.nazwisko + "','" + self.imie1 + '','' + self.imie2 + "','" + self.data_wpisu_do_regon + "','" + self.data_zaistnienia_zmiany + "','" + self.data_skreslenia_z_regon + "','" + self.podstawowa_forma_prawna + "'.'" + self.szczegolna_forma_prawna + "','" + self.forma_finansowania + "','" + self.forma_wlasnosci + "','" + self.dzialalnosc_CEIDG + "'," + self.dzialalnosc_rolnicza + ',' + self.dzialalnosc_pozostala + ',' + self.dzialalnosc_skreslona_do_20141108 + ',' + self.liczba_jednostek_lokalnych + ')'
+
+class common_LF(common_item):
+    def __init__(self, table_row):
+        super(common_P_item, self).__init__(regon=table_row[1], nip=table_row[2], nip_status=table_row[3], regon_wpis=table_row[7], regon_zmiana=table_row[8], regon_skreslenie=table_row[9], podstawowa_forma_prawna=table_row[10], szczegolna_forma_prawna=table_row[11], forma_finansowania=table_row[12], forma_wlasnosci=table_row[13])
+
+class two_column_item():
+    def __init__(self, table_row):
+        self.primary_key = table_row[0]
+        self.name = table_row[1]
+
+    def __str__(self):
+        return "('" + self.primary_key + "','" + self.name + "')"
 
 class county_item():
     def __init__(self, table_row):
