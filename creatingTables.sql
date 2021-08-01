@@ -113,12 +113,12 @@ CREATE TABLE common_P(
     CONSTRAINT fk_organRejestrowy_Symbol FOREIGN KEY (praw_organRejestrowy_Symbol) REFERENCES registration_authorities(organ_rejestrowy_symbol),
     CONSTRAINT fk_rodzajRejestruEwidencji_Symbol FOREIGN KEY (praw_rodzajRejestruEwidencji_SYmbol) REFERENCES type_of_register_of_records(rodzaj_rejestru_ewidencji_symbol)
     --CONSTRAINT fk_regon FOREIGN KEY (praw_regon) REFERENCES summary_data(regon)
-);
+); --created
 DROP TABLE common_P;
 
 CREATE TABLE common_F(
     id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    fiz_regon varchar(14) NOT NULL CHECK ( length(fiz_regon) > 8 ),
+    fiz_regon varchar(9) NOT NULL CHECK ( length(fiz_regon) > 8 ),
     fiz_NIP varchar(10),
     fiz_statusNIP varchar(10),
     fiz_Nazwisko varchar(100),
@@ -142,19 +142,21 @@ CREATE TABLE common_F(
     CONSTRAINT fk_formaFinansowania_Symbol FOREIGN KEY (fiz_formaFinansowania_Symbol) REFERENCES forms_of_financing(forma_finansowania_symbol),
     CONSTRAINT fk_formaWlasnosci_Symbol FOREIGN KEY (fiz_formaWlasnosci_Symbol) REFERENCES forms_of_ownership(forma_wlasnosci_symbol)
     --CONSTRAINT fk_regon FOREIGN KEY (fiz_regon) REFERENCES summary_data(regon)
-);
+); --created
+
+ALTER TABLE common_F ALTER COLUMN fiz_regon TYPE varchar(9);
 
 CREATE TABLE register_types(
     rodzajRejestru_Symbol varchar(10) PRIMARY KEY,
     rodzajRejestru_Nazwa varchar(256)
-);
+); -- created
 ALTER TABLE summary_data ADD CONSTRAINT regon_len CHECK ( length(regon) > 8 );
 
 CREATE TABLE silos(
     silosID INT PRIMARY KEY,
     silos_Nazwa varchar(256)
-);
-
+); -- created
+DROP TABLE common_lf;
 CREATE TABLE common_LF(
     id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     lokfiz_regon varchar(14) NOT NULL CHECK ( length(lokfiz_regon) > 8 ),
@@ -162,6 +164,7 @@ CREATE TABLE common_LF(
     lokfiz_nazwa varchar(256),
     lokfiz_silosID INT,
     lokfiz_dataPowstania DATE,
+    lokfiz_dataRozpoczeciaDzialalnosci DATE,
     lokfiz_dataWpisuDoRegon DATE,
     lokfiz_dataZawieszeniaDzialanosci DATE,
     lokfiz_dataWznowieniaDzialanosci DATE,
@@ -186,7 +189,7 @@ CREATE TABLE common_LF(
     lokfiz_rodzajRejestru_Symbol varchar(10),
     lokfizC_niePodjetoDzialanosci varchar(10),
     lokfiz_dataWpisuDoBazyDanych DATE,
-    CONSTRAINT fk_lokfiz_parentRegon FOREIGN KEY (lokfiz_parentRegon) REFERENCES common_F(fiz_regon),
+--     CONSTRAINT fk_lokfiz_parentRegon FOREIGN KEY (lokfiz_parentRegon) REFERENCES common_F(fiz_regon),
     CONSTRAINT fk_silosID FOREIGN KEY (lokfiz_silosID) REFERENCES silos(silosID),
     CONSTRAINT fk_lokfiz_siedzKraj_Symbol FOREIGN KEY (lofkiz_siedzKraj_Symbol) REFERENCES countries(siedz_kraj_symbol),
     CONSTRAINT fk_lokfiz_siedzWojewodztwo FOREIGN KEY (lokfiz_siedzWojewodztwo_Symbol) REFERENCES states(siedz_wojewodztwa_symbol),
@@ -197,7 +200,7 @@ CREATE TABLE common_LF(
     CONSTRAINT fk_lokfiz_formaFinansowania FOREIGN KEY (lokfiz_formaFinansowania_Symbol) REFERENCES forms_of_financing(forma_finansowania_symbol),
     CONSTRAINT fk_lokfiz_organRejestrowy FOREIGN KEY (lokfiz_organRejestrowy_Symbol) REFERENCES registration_authorities(organ_rejestrowy_symbol),
     CONSTRAINT fk_lokfiz_rodzajRejestru FOREIGN KEY (lokfiz_rodzajRejestru_Symbol) REFERENCES register_types(rodzajRejestru_Symbol)
-);
+); -- created
 
 CREATE TABLE common_LP(
     id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -229,8 +232,8 @@ CREATE TABLE common_LP(
     lokpraw_organRejestrowy_Symbol varchar(10),
     lokpraw_rodzajRejestruEwidencji_Symbol varchar(10),
     lokpraw_dataWpisuDoBazyDanych DATE,
-    CONSTRAINT fk_lokpraw_regon FOREIGN KEY (lokpraw_regon) REFERENCES summary_data(regon),
-    CONSTRAINT fk_lokpraw_parentRegon FOREIGN KEY (lokpraw_parentRegon) REFERENCES common_P(praw_regon),
+--     CONSTRAINT fk_lokpraw_regon FOREIGN KEY (lokpraw_regon) REFERENCES summary_data(regon),
+--     CONSTRAINT fk_lokpraw_parentRegon FOREIGN KEY (lokpraw_parentRegon) REFERENCES common_P(praw_regon),
     CONSTRAINT fk_lokpraw_siedzKraj_Symbol FOREIGN KEY (lokpraw_siedzKraj_Symbol) REFERENCES countries(siedz_kraj_symbol),
     CONSTRAINT fk_lokpraw_siedzWojewodztwo_Symbol FOREIGN KEY (lokpraw_siedzWojewodztwo_Symbol) REFERENCES states(siedz_wojewodztwa_symbol),
     CONSTRAINT fk_lokpraw_siedzPowiat FOREIGN KEY (lokpraw_siedzPowiat_Symbol) REFERENCES counties(siedz_powiat_symbol),
@@ -245,10 +248,10 @@ CREATE TABLE common_LP(
 CREATE TABLE pkds(
     pkd_Kod varchar(10) PRIMARY KEY,
     pkd_Nazwa varchar(256)
-);
+); -- created
 
-
-CREATE TABLE pkd_F_ovnership(
+DROP TABLE pkd_f_ownership;
+CREATE TABLE pkd_F_ownership(
     fiz_pkd_regon varchar(9) NOT NULL,
     fiz_pkd_Kod varchar(10) NOT NULL,
     fiz_pkd_Przewazajace INT,
@@ -256,7 +259,7 @@ CREATE TABLE pkd_F_ovnership(
     CONSTRAINT pk_pkd_F_ovnership PRIMARY KEY (fiz_pkd_regon, fiz_pkd_Kod),
     CONSTRAINT fk_pkd_Kod FOREIGN KEY (fiz_pkd_Kod) REFERENCES pkds(pkd_Kod),
     CONSTRAINT fk_silos FOREIGN KEY (fiz_pkd_SilosID) REFERENCES silos(silosID)
-);
+); -- created
 
 CREATE TABLE pkd_LF_ownership(
     lokfiz_pkd_regon varchar(14) NOT NULL,
@@ -265,7 +268,7 @@ CREATE TABLE pkd_LF_ownership(
     lokfiz_Silos_Symbol varchar(256),
     CONSTRAINT pk_pkd_LF_ownership PRIMARY KEY (lokfiz_pkd_regon, lokfiz_pkd_Kod),
     CONSTRAINT fk_pkd_Kod FOREIGN KEY (lokfiz_pkd_Kod) REFERENCES pkds(pkd_Kod)
-);
+); -- created
 
 CREATE TABLE pkd_LP_ownership(
     lokpraw_pkd_regon varchar(14) NOT NULL,
@@ -273,7 +276,7 @@ CREATE TABLE pkd_LP_ownership(
     lokpraw_pkdPrzewazajace INT,
     CONSTRAINT pk_pkd_LP_ownership PRIMARY KEY (lokpraw_pkd_regon, lokpraw_pkdKod),
     CONSTRAINT fk_lokpraw_pkdKod FOREIGN KEY (lokpraw_pkdKod) REFERENCES pkds(pkd_Kod)
-);
+); -- created
 
 CREATE TABLE pkd_P_ownership(
     praw_pkd_regon varchar(9) NOT NULL,
@@ -281,4 +284,4 @@ CREATE TABLE pkd_P_ownership(
     praw_pkdPrzewazajace INT,
     CONSTRAINT pk_pkd_P_ownership PRIMARY KEY (praw_pkd_regon, praw_pkdKod),
     CONSTRAINT fk_praw_pkdKod FOREIGN KEY (praw_pkdKod) REFERENCES pkds(pkd_Kod)
-);
+); -- created
