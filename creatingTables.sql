@@ -270,6 +270,8 @@ CREATE TABLE pkd_LF_ownership(
     CONSTRAINT fk_pkd_Kod FOREIGN KEY (lokfiz_pkd_Kod) REFERENCES pkds(pkd_Kod)
 ); -- created
 
+ALTER TABLE pkd_LF_ownership ALTER COLUMN lokfiz_Silos_Symbol TYPE INT USING lokfiz_Silos_Symbol::integer;
+
 CREATE TABLE pkd_LP_ownership(
     lokpraw_pkd_regon varchar(14) NOT NULL,
     lokpraw_pkdKod varchar(10) NOT NULL,

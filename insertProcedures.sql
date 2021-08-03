@@ -306,3 +306,50 @@ proc_pkdF_Przewazajace INT, proc_pkdF_SilosID INT) LANGUAGE plpgsql AS $$
 end;
 $$; -- created
 
+CREATE OR REPLACE PROCEDURE insert_into_pkd_LF_ownership(
+proc_pkd_LFRegon varchar(14), proc_pkd_Kod varchar(10), proc_pkd_Nazwa varchar(256),
+proc_pkd_Przewazajace INT, proc_pkd_silosSymbol INT, proc_pkd_silosNazwa varchar(100)
+) LANGUAGE plpgsql AS $$
+    BEGIN
+       IF NOT EXISTS(SELECT * FROM silos WHERE silosid = proc_pkd_silosSymbol) AND
+          proc_pkd_silosSymbol IS NOT NULL THEN
+           INSERT INTO silos (silosid, silos_nazwa) VALUES
+           (proc_pkd_silosSymbol, proc_pkd_silosNazwa);
+       end if;
+       IF NOT EXISTS(SELECT * FROM pkds WHERE pkd_kod = proc_pkd_Kod) THEN
+           INSERT INTO pkds (pkd_kod, pkd_nazwa) VALUES
+           (proc_pkd_Kod, proc_pkd_Nazwa);
+       end if;
+       INSERT INTO pkd_lf_ownership (lokfiz_pkd_regon, lokfiz_pkd_kod,
+                                     lokfiz_pkd_przewazajace, lokfiz_silos_symbol) VALUES
+        (proc_pkd_LFRegon, proc_pkd_Kod, proc_pkd_Przewazajace, proc_pkd_silosSymbol);
+    end;
+    $$;
+
+CREATE OR REPLACE PROCEDURE insert_into_pkd_LP_ownership(
+proc_LP_regon varchar(14), proc_pkd_LP_kod varchar(10), proc_pkd_LP_Nazwa varchar(256),
+proc_LP_pkdPrzewazajace INT
+)LANGUAGE plpgsql AS $$
+    BEGIN
+        IF NOT EXISTS(SELECT * FROM pkds WHERE pkd_kod = proc_pkd_LP_kod) THEN
+            INSERT INTO pkds (pkd_kod, pkd_nazwa) VALUES
+            (proc_pkd_LP_kod, proc_pkd_LP_Nazwa);
+        end if;
+        INSERT INTO pkd_lp_ownership (lokpraw_pkd_regon, lokpraw_pkdkod, lokpraw_pkdprzewazajace) VALUES
+        (proc_LP_regon, proc_pkd_LP_kod, proc_LP_pkdPrzewazajace);
+    end;
+    $$;
+
+CREATE OR REPLACE PROCEDURE insert_into_pkd_P_ownership(
+proc_P_PkdRegon varchar(9), proc_P_pkdKod varchar(10), proc_P_pkdNazwa varchar(256),
+proc_P_pkdPrzewazajace INT
+) LANGUAGE plpgsql AS $$
+    BEGIN
+        IF NOT EXISTS(SELECT * FROM pkds WHERE pkd_kod = proc_P_pkdKod) THEN
+            INSERT INTO pkds (pkd_kod, pkd_nazwa) VALUES
+            (proc_P_pkdKod, proc_P_pkdNazwa);
+        end if;
+        INSERT INTO pkd_p_ownership (praw_pkd_regon, praw_pkdkod, praw_pkdprzewazajace) VALUES
+        (proc_P_PkdRegon, proc_P_pkdKod, proc_P_pkdPrzewazajace);
+    END;
+$$;
