@@ -5,8 +5,36 @@ CREATE OR REPLACE FUNCTION get_parent_regon(long_regon varchar(14)) RETURNS varc
         SELECT LEFT(long_regon, 9) INTO parent_regon;
         RETURN parent_regon;
     end;
-    $parent_regon$ LANGUAGE plpgsql;
+    $parent_regon$ LANGUAGE plpgsql; -- created
 
+CREATE OR REPLACE PROCEDURE insert_addresses(
+municipality_symbol varchar(10), municipality_name varchar(256), town_symbol varchar(10),
+town_name varchar(256), post_symbol varchar(10), post_name varchar(256), street_symbol varchar(10),
+street_name varchar(256)
+)LANGUAGE plpgsql AS $$
+    BEGIN
+        IF NOT EXISTS(SELECT * FROM municipalities WHERE siedz_gmina_symbol = municipality_symbol) AND
+           municipality_symbol IS NOT NULL THEN
+            INSERT INTO municipalities (siedz_gmina_symbol, siedz_gmina_nazwa) VALUES
+            (municipality_symbol, municipality_name);
+        end if;
+        IF NOT EXISTS(SELECT * FROM towns WHERE siedz_miejscowosc_symbol = town_symbol) AND
+           town_symbol IS NOT NULL THEN
+            INSERT INTO towns (siedz_miejscowosc_symbol, siedz_miejscowosc_nazwa) VALUES
+            (town_symbol, town_name);
+        end if;
+        IF NOT EXISTS(SELECT * FROM posts WHERE siedz_miejscowosc_poczty_symbol = post_symbol) AND
+           post_symbol IS NOT NULL THEN
+            INSERT INTO posts (siedz_miejscowosc_poczty_symbol, siedz_miejscowosc_poczty_nazwa) VALUES
+            (post_symbol, post_name);
+        end if;
+        IF NOT EXISTS(SELECT * FROM streets WHERE siedz_ulica_symbol = street_symbol) AND
+           post_symbol IS NOT NULL THEN
+            INSERT INTO streets (siedz_ulica_symbol, siedz_ulica_nazwa) VALUES
+            (street_symbol, street_name);
+        end if;
+    end;
+$$; -- created
 
 CREATE OR REPLACE PROCEDURE insert_into_common_P(
     regon varchar(9), proc_nip varchar(10) DEFAULT NULL, proc_statusNip varchar(10) DEFAULT NULL, proc_nazwa varchar(256) DEFAULT NULL,
@@ -16,8 +44,9 @@ CREATE OR REPLACE PROCEDURE insert_into_common_P(
     proc_dataZakonczeniaDzialanosci DATE DEFAULT NULL, proc_dataSkresleniaZRegon DATE DEFAULT NULL, proc_dataOrzeczeniaOUpadlosci DATE DEFAULT NULL,
     proc_dataZakonczeniaPostepowaniaUpadlosciowego DATE DEFAULT NULL, proc_siedzibaKraj_Symbol varchar(10) DEFAULT NULL, proc_siedzWojewodztwo_Symbol varchar(10) DEFAULT NULL,
     proc_siedzPowiat_Symbol varchar(10) DEFAULT NULL, proc_siedzGminaSymbol varchar(10) DEFAULT NULL, proc_siedzGminaNazwa varchar(256) DEFAULT NULL,
-    proc_siedzKodPocztowy varchar(7) DEFAULT NULL, proc_siedzMiejscowoscPoczty_Symbol varchar(10) DEFAULT NULL, proc_siedzMiejscowosc_Symbol varchar(10) DEFAULT NULL,
-    proc_siedzUlicaSymbol varchar(10) DEFAULT NULL, proc_siedzUlicaNazwa varchar(256),proc_siedzNumerNieruchomosci varchar(15) DEFAULT NULL,
+    proc_siedzKodPocztowy varchar(7) DEFAULT NULL, proc_siedzMiejscowoscPoczty_Symbol varchar(10) DEFAULT NULL,proc_siedzMiejscowoscPoczty_Nazwa varchar(256) DEFAULT NULL, proc_siedzMiejscowosc_Symbol varchar(10) DEFAULT NULL,
+    proc_siedzMiejscowosc_Nazwa varchar(256) DEFAULT NULL,
+    proc_siedzUlicaSymbol varchar(10) DEFAULT NULL, proc_siedzUlicaNazwa varchar(256) DEFAULT NULL, proc_siedzNumerNieruchomosci varchar(15) DEFAULT NULL,
     proc_siedzNumerLokalu varchar(15) DEFAULT NULL, proc_siedzNietypoweMiejsceLokalizacji varchar(100) DEFAULT NULL,
     proc_numerTelefonu varchar(13) DEFAULT NULL, proc_numerWewnetrznyTelefoonu varchar(15) DEFAULT NULL,
     proc_numerFaksu varchar(20) DEFAULT NULL, proc_adresStronyInternetowej varchar(100) DEFAULT NULL,
@@ -32,14 +61,9 @@ CREATE OR REPLACE PROCEDURE insert_into_common_P(
 )LANGUAGE plpgsql
  as $$
 begin
-    IF NOT EXISTS(SELECT * FROM municipalities WHERE siedz_gmina_symbol = proc_siedzGminaSymbol) AND proc_siedzGminaSymbol IS NOT NULL THEN
-        INSERT INTO municipalities (siedz_gmina_symbol, siedz_gmina_nazwa) VALUES
-        (proc_siedzGminaSymbol, proc_siedzGminaNazwa);
-    end if;
-
-    IF NOT EXISTS(SELECT * FROM streets WHERE siedz_ulica_symbol = proc_siedzUlicaSymbol) AND proc_siedzUlicaSymbol IS NOT NULL THEN
-        INSERT INTO streets (siedz_ulica_symbol, siedz_ulica_nazwa) VALUES (proc_siedzUlicaSymbol, proc_siedzUlicaNazwa);
-    end if;
+    CALL insert_addresses(proc_siedzGminaSymbol, proc_siedzGminaNazwa, proc_siedzMiejscowosc_Symbol,
+        proc_siedzMiejscowosc_Nazwa, proc_siedzMiejscowoscPoczty_Symbol, proc_siedzMiejscowoscPoczty_Nazwa,
+        proc_siedzUlicaSymbol, proc_siedzUlicaNazwa);
 
     if not exists(SELECT * FROM basic_legal_form where podstawowa_forma_prawna_symbol = proc_podstawowaFormaPrawna_Symbol) AND
        proc_podstawowaFormaPrawna_Symbol IS NOT NULL THEN
@@ -93,7 +117,7 @@ begin
                                   proc_organRejestrowy_Symbol, proc_rodzajRejestruEwidencji_SYmbol, proc_liczbaJednostekLokalnych, proc_dataWpisuDoBazyDanych);
 
 end;
-    $$;
+    $$; -- created
 
 CREATE OR REPLACE PROCEDURE insert_into_common_F(
 fproc_regon varchar(9), fproc_nip varchar(10), fproc_statusNIP varchar(10), fproc_nazwisko varchar(100), fproc_imie1 varchar(100), fproc_imie2 varchar(10),
@@ -134,7 +158,7 @@ fproc_dzialalnoscPozostala INT, fproc_dzialalnoscSkreslona INT, fproc_liczbaJedn
                                     fproc_dzialanoscCEIDG, fproc_dzialanoscRolnicza, fproc_dzialalnoscPozostala, fproc_dzialalnoscSkreslona,
                                     fproc_liczbaJednostekLokalnych, fproc_dataWpisuDoBazyDanych);
     end;
-    $$;
+    $$; -- created
 
 
 CREATE OR REPLACE PROCEDURE insert_into_common_LP(proc_lokpraw_regon varchar(14), --proc_lokpraw_parentRegon varchar(9),
@@ -143,7 +167,7 @@ CREATE OR REPLACE PROCEDURE insert_into_common_LP(proc_lokpraw_regon varchar(14)
     proc_lokpraw_dataZawieszeniaDzialanosci DATE, proc_lokpraw_dataWznowieniaDzialanosci DATE, proc_lokpraw_dataZaistnieniaZmiany DATE,
     proc_lokpraw_dataZakonczeniaDzialanosci DATE, proc_lokpraw_dataSkresleniaZRegon DATE, proc_lokpraw_siedzKraj_Symbol varchar(10),
     proc_lokpraw_siedzWojewodztwo_Symbol varchar(10), proc_lokpraw_siedzPowiat_Symbol varchar(10), proc_lokpraw_siedzGmina_Symbol varchar(10),
-    proc_lokpraw_siedzGmina_Nazwa varchar(256), proc_lokpraw_siedzMiejscowoscPoczty_Symbol varchar(10), proc_lokpraw_siedzMiejscowosc_Symbol varchar(10),
+    proc_lokpraw_siedzGmina_Nazwa varchar(256), proc_lokpraw_siedzMiejscowoscPoczty_Symbol varchar(10), proc_lokpraw_siedzMiejscowoscPoczty_Nazwa varchar(256), proc_lokpraw_siedzMiejscowosc_Symbol varchar(10),
     proc_lokpraw_siedzMiejscowosc_Nazwa varchar(256), proc_lokpraw_siedzUlica_Symbol varchar(10), proc_lokpraw_siedzUlica_Nazwa varchar(256),
     proc_lokpraw_siedzKodPocztowy varchar(7), proc_lokpraw_siedzNumerNieruchomosci varchar(10), proc_lokpraw_siedzNumerLokalu varchar(10),
     proc_lokpraw_siedzNietypoweMiejsceLokalizacji varchar(256), proc_lokpraw_formaFinansowania_Symbol varchar(10), proc_lokpraw_formaFinansowania_Nazwa varchar(256),
@@ -168,20 +192,10 @@ CREATE OR REPLACE PROCEDURE insert_into_common_LP(proc_lokpraw_regon varchar(14)
            INSERT INTO type_of_register_of_records (rodzaj_rejestru_ewidencji_symbol, rodzaj_rejestru_ewidencji_nazwa) VALUES
            (proc_lokpraw_rodzajRejestruEwidencji_Symbol, proc_lokpraw_rodzajRejestruEwidencji_Nazwa);
        end if;
-       IF NOT EXISTS(SELECT * FROM streets WHERE siedz_ulica_symbol = proc_lokpraw_siedzUlica_Symbol) AND proc_lokpraw_siedzUlica_Symbol IS NOT NULL THEN
-           INSERT INTO streets (siedz_ulica_symbol, siedz_ulica_nazwa) VALUES (proc_lokpraw_siedzUlica_Symbol, proc_lokpraw_siedzUlica_Nazwa);
-       end if;
-       IF NOT EXISTS(SELECT * FROM municipalities WHERE siedz_gmina_symbol = proc_lokpraw_siedzGmina_Symbol) AND proc_lokpraw_siedzGmina_Symbol IS NOT NULL THEN
-           INSERT INTO municipalities (siedz_gmina_symbol, siedz_gmina_nazwa) VALUES (proc_lokpraw_siedzGmina_Symbol, proc_lokpraw_siedzGmina_Nazwa);
-       end if;
-       IF NOT EXISTS(SELECT * FROM towns WHERE siedz_miejscowosc_symbol = proc_lokpraw_siedzMiejscowosc_Symbol) AND proc_lokpraw_siedzMiejscowosc_Symbol IS NOT NULL THEN
-           INSERT INTO towns (siedz_miejscowosc_symbol, siedz_miejscowosc_nazwa) VALUES (proc_lokpraw_siedzMiejscowosc_Symbol, proc_lokpraw_siedzMiejscowosc_Nazwa);
-       end if;
-       IF NOT EXISTS(SELECT * FROM posts WHERE siedz_miejscowosc_poczty_symbol = proc_lokpraw_siedzMiejscowoscPoczty_Symbol) AND
-          proc_lokpraw_siedzMiejscowoscPoczty_Symbol IS NOT NULL THEN
-           INSERT INTO posts (siedz_miejscowosc_poczty_symbol, siedz_miejscowosc_poczty_nazwa) VALUES
-           (proc_lokpraw_siedzMiejscowoscPoczty_Symbol, proc_lokpraw_siedzMiejscowosc_Nazwa);
-       end if;
+       CALL insert_addresses(proc_lokpraw_siedzGmina_Symbol, proc_lokpraw_siedzGmina_Nazwa,
+           proc_lokpraw_siedzMiejscowosc_Symbol, proc_lokpraw_siedzMiejscowosc_Nazwa,
+           proc_lokpraw_siedzMiejscowoscPoczty_Symbol, proc_lokpraw_siedzMiejscowoscPoczty_Nazwa,
+           proc_lokpraw_siedzUlica_Symbol, proc_lokpraw_siedzUlica_Nazwa);
         INSERT INTO common_LP (lokpraw_regon, lokpraw_parentRegon, lokpraw_nazwa, lokpraw_numerWRejestrzeEwiddencji,
                                lokpraw_dataWpisuDoRejestruEwidencji, lokpraw_dataPowstania, lokpraw_dataRozpoczeciaDzialalnosci,
                                lokpraw_dataWpisuDoRegon, lokpraw_dataZawieszeniaDzialanosci, lokpraw_dataWznowieniaDzialanosci,
@@ -200,7 +214,7 @@ CREATE OR REPLACE PROCEDURE insert_into_common_LP(proc_lokpraw_regon varchar(14)
          proc_lokpraw_organRejestrowy_Symbol, proc_lokpraw_rodzajRejestruEwidencji_Symbol, proc_lokpraw_dataWpisuDoBazyDanych);
 
        end;
-$$;
+$$; -- created
 
 
 CREATE OR REPLACE PROCEDURE insert_into_common_LF(
@@ -223,10 +237,6 @@ CREATE OR REPLACE PROCEDURE insert_into_common_LF(
         proc_lokfiz_parentRegon varchar(9);
     BEGIN
         SELECT get_parent_regon(proc_lokfiz_regon) INTO proc_lokfiz_parentRegon;
-        IF NOT EXISTS(SELECT * FROM streets WHERE siedz_ulica_symbol = proc_lokfiz_siedzUlica_Symbol) AND proc_lokfiz_siedzUlica_Symbol IS NOT NULL THEN
-            INSERT INTO streets (siedz_ulica_symbol, siedz_ulica_nazwa) VALUES
-            (proc_lokfiz_siedzUlica_Symbol, proc_lokfizUlica_Nazwa);
-        end if;
         IF NOT EXISTS(SELECT * FROM forms_of_financing WHERE forma_finansowania_symbol = proc_lokfiz_formaFinansowania_Symbol)
             AND proc_lokfiz_formaFinansowania_Symbol IS NOT NULL THEN
             INSERT INTO forms_of_financing (forma_finansowania_symbol, forma_finansowania_nazwa) VALUES
@@ -245,18 +255,10 @@ CREATE OR REPLACE PROCEDURE insert_into_common_LF(
         IF NOT EXISTS(SELECT * FROM forms_of_financing WHERE forma_finansowania_symbol = proc_lokfiz_formaFinansowania_Symbol) AND proc_lokfiz_formaFinansowania_Symbol IS NOT NULL THEN
             INSERT INTO forms_of_financing (forma_finansowania_symbol, forma_finansowania_nazwa) VALUES (proc_lokfiz_formaFinansowania_Symbol, proc_lokfiz_formaFinansowania_Nazwa);
         end if;
-        IF NOT EXISTS(SELECT * FROM municipalities WHERE siedz_gmina_symbol = proc_lokfiz_siedzGmina_Symbol) AND proc_lokfiz_siedzGmina_Symbol IS NOT NULL THEN
-            INSERT INTO municipalities (siedz_gmina_symbol, siedz_gmina_nazwa) VALUES
-            (proc_lokfiz_siedzGmina_Symbol, proc_lokfiz_siedzGmina_Nazwa);
-        end if;
-        IF NOT EXISTS(SELECT * FROM towns WHERE siedz_miejscowosc_symbol = proc_lokfiz_siedzMiejscowosc_Symbol) AND proc_lokfiz_siedzMiejscowosc_Symbol IS NOT NULL THEN
-            INSERT INTO towns (siedz_miejscowosc_symbol, siedz_miejscowosc_nazwa) VALUES
-            (proc_lokfiz_siedzMiejscowosc_Symbol, proc_lokfiz_siedzMiejscowosc_Nazwa);
-        end if;
-        IF NOT EXISTS(SELECT * FROM posts WHERE siedz_miejscowosc_poczty_symbol = proc_lokfiz_siedzMiejscowoscPoczty_Symbol) AND proc_lokfiz_siedzMiejscowoscPoczty_Symbol IS NOT NULL THEN
-            INSERT INTO posts (siedz_miejscowosc_poczty_symbol, siedz_miejscowosc_poczty_nazwa) VALUES
-            (proc_lokfiz_siedzMiejscowoscPoczty_Symbol, proc_lokfiz_siedzPoczty_Nazwa);
-        end if;
+        CALL insert_addresses(proc_lokfiz_siedzGmina_Symbol, proc_lokfiz_siedzGmina_Nazwa,
+            proc_lokfiz_siedzMiejscowosc_Symbol, proc_lokfiz_siedzMiejscowosc_Nazwa,
+            proc_lokfiz_siedzMiejscowoscPoczty_Symbol, proc_lokfiz_siedzPoczty_Nazwa,
+            proc_lokfiz_siedzUlica_Symbol, proc_lokfizUlica_Nazwa);
         IF NOT EXISTS(SELECT * FROM silos WHERE silosid = proc_lokfiz_silosID) AND proc_lokfiz_silosID IS NOT NULL THEN
             INSERT INTO silos (silosid, silos_nazwa) VALUES (proc_lokfiz_silosID, proc_lokfiz_SilosNazwa);
         end if;
@@ -278,7 +280,7 @@ CREATE OR REPLACE PROCEDURE insert_into_common_LF(
                      proc_lokfiz_formaFinansowania_Symbol, proc_lokfiz_dataWpisuDoRejestruEwidencji, proc_lokfiz_numerWRejestrzeEwidencji,
                      proc_lokfiz_organRejestrowy_Symbol, proc_lokfiz_rodzajRejestru_Symbol, proc_lokfizC_niePodjetoDzialanosci, proc_lokfiz_dataWpisuDoBazyDanych);
         end;
-    $$;
+    $$; -- created
 
 CREATE PROCEDURE insert_into_forms_of_financing(symbol varchar(10), nazwa varchar(256))
 LANGUAGE plpgsql AS $$
@@ -302,4 +304,5 @@ proc_pkdF_Przewazajace INT, proc_pkdF_SilosID INT) LANGUAGE plpgsql AS $$
     INSERT INTO pkd_f_ownership (fiz_pkd_regon, fiz_pkd_kod, fiz_pkd_przewazajace, fiz_pkd_silosid) VALUES
         (proc_pkdF_regon, proc_pkdF_kod, proc_pkdF_Przewazajace, proc_pkdF_SilosID);
 end;
-$$;
+$$; -- created
+
