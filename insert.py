@@ -17,7 +17,7 @@ class common_item():
         self.forma_wlasnosci = forma_wlasnosci
         
 
-class common_P_item(common_item):
+class common_P_item(common_item): #version for files with index column 
     def __init__(self, table_row):
         super(common_P_item, self).__init__(regon=table_row[1], nip=table_row[2], nip_status=table_row[3], regon_wpis=table_row[9], regon_zmiana=table_row[12], regon_skreslenie=table_row[14], podstawowa_forma_prawna=table_row[40], szczegolna_forma_prawna=table_row[41], forma_finansowania=table_row[42], forma_wlasnosci=table_row[43])
         self.nazwa = table_row[3]
@@ -68,7 +68,71 @@ class common_F (common_item):
         self.liczba_jednostek_lokalnych = table_row[22]
     
     def __str__(self):
-        return "('" + self.regon + "','" + self.nip + "','" + self.status_nip + "','" + self.nazwisko + "','" + self.imie1 + '','' + self.imie2 + "','" + self.data_wpisu_do_regon + "','" + self.data_zaistnienia_zmiany + "','" + self.data_skreslenia_z_regon + "','" + self.podstawowa_forma_prawna + "'.'" + self.szczegolna_forma_prawna + "','" + self.forma_finansowania + "','" + self.forma_wlasnosci + "','" + self.dzialalnosc_CEIDG + "'," + self.dzialalnosc_rolnicza + ',' + self.dzialalnosc_pozostala + ',' + self.dzialalnosc_skreslona_do_20141108 + ',' + self.liczba_jednostek_lokalnych + ')'
+        return "('" + self.regon + "','" + self.nip + "','" + self.status_nip + "','" + self.nazwisko + "','" + self.imie1 + '','' + self.imie2 + "','" + self.data_wpisu_do_regon + "','" + self.data_zaistnienia_zmiany + "','" + self.data_skreslenia_z_regon + "','" + self.podstawowa_forma_prawna + "'.'" + self.szczegolna_forma_prawna + "','" + self.forma_finansowania + "','" + self.forma_wlasnosci + "'," + self.dzialalnosc_CEIDG + "," + self.dzialalnosc_rolnicza + ',' + self.dzialalnosc_pozostala + ',' + self.dzialalnosc_skreslona_do_20141108 + ',' + self.liczba_jednostek_lokalnych + ')'
+
+class F_specified_item():
+    def __init__(self, table_row) -> None:
+        self.regon = table_row[0]
+        self.nazwa = table_row[1]
+        self.nazwa_skrocona = table_row[2]
+        self.powstanie = table_row[3]
+        self.rozpoczecie_dzialalnosci = table_row[4]
+        self.regon_wpis = table_row[5]
+        self.zawieszenie = table_row[6]
+        self.wznowienie = table_row[7]
+        self.zatstnienie_zmiany = table_row[8]
+        self.zakonczenie_dzialalnosci = table_row[9]
+        self.skreslenie_regon = table_row[10]
+        self.orzeczenie_upadlosci = table_row[11]
+        self.zakonczenie_postepowania_upadlosciowego = table_row[12]
+        self.kraj_symbol = table_row[13]
+        self.kraj_nazwa = table_row[29]
+        self.wojewodztwo_symbol = table_row[14]
+        self.wojewodztwo_nazwa = table_row[30]
+        self.powiat_symbol = self.wojewodztwo_symbol + table_row[15]
+        self.powiat_nazwa = table_row[31]
+        self.gmina_symbol = table_row[16]
+        self.gmina_nazwa = table_row[32]
+        self.kod_pocztowy = table_row[17]
+        self.miejscowosc_poczty_symbol = table_row[18]
+        self.miejscowosc_poczty_nazwa = table_row[34]
+        self.miejscowosc_symbol = table_row[19]
+        self.miejscowosc_nazwa = table_row[33]
+        self.ulica_symbol = table_row[20]
+        self.ulica_nazwa = table_row[35]
+        self.numer_nieruchomosci = table_row[21]
+        self.numer_lokalu = table_row[22]
+        self.nietypowe_miejsce_lokalizacji = table_row[23]
+        self.numer_telefonu = table_row[24]
+        self.numer_wewnetrzny_telefonu = table_row[25]
+        self.numer_faksu = table_row[26]
+        self.adres_email = table_row[27]
+        self.adres_strony_internetowej = table_row[28]
+        
+class F_ceidg(F_specified_item):
+    def __init__(self, table_row) -> None:
+        super().__init__(table_row)
+        self.wpis_rejestr_ewidencji = table_row[36]
+        self.skreslenie_rejestr_ewidencji = table_row[37]
+        self.numer_rejestr_ewidencji = table_row[38]
+        self.organ_rejestrowy_symbol = table_row[39]
+        self.organ_rejestrowy_nazwa = table_row[40]
+        self.rodzaj_rejestru_symbol = table_row[41]
+        self.rodzaj_rejestru_nazwa = table_row[42]
+        self.nie_podjeto_dzialalnosci = table_row[43]
+
+    def __str__(self) -> str:
+        return "('" + self.regon + "','" + self.nazwa + "','" + self.nazwa_skrocona + "','" + self.powstanie + "','" + self.rozpoczecie_dzialalnosci + "','" + self.regon_wpis + "','" + self.zawieszenie + "','" + self.wznowienie + "','" + self.zatstnienie_zmiany + "','" + self.zakonczenie_dzialalnosci + "','" + self.skreslenie_regon + "','" + self.orzeczenie_upadlosci + "','" + self.zakonczenie_postepowania_upadlosciowego + "','" + self.kraj_symbol + "','" +self.wojewodztwo_symbol + "','" + self.powiat_symbol + "','" + self.gmina_symbol + "','" + self.kod_pocztowy + "','" + self.miejscowosc_poczty_symbol + "','" + self.miejscowosc_symbol + "','" + self.ulica_symbol + "','" + self.numer_nieruchomosci + "','" + self.numer_lokalu + "','" + self.nietypowe_miejsce_lokalizacji + "','" + self.numer_telefonu + "','" + self.numer_wewnetrzny_telefonu + "','" + "','" + self.numer_faksu + "','" + self.adres_strony_internetowej + "','" + self.wpis_rejestr_ewidencji + "','" + self.skreslenie_rejestr_ewidencji + "','" + self.numer_rejestr_ewidencji + "','" + self.organ_rejestrowy_symbol + "','" + self.rodzaj_rejestru_symbol + "','" + self.nie_podjeto_dzialalnosci + "','" + self.miejscowosc_nazwa + "','" + self.gmina_nazwa + "','" + self.miejscowosc_poczty_nazwa + "','" + self.ulica_nazwa + "','" + self.organ_rejestrowy_nazwa + "','" + self.rodzaj_rejestru_nazwa + "')"
+
+class F_agriculture(F_specified_item):
+    def __init__(self, table_row) -> None:
+        super().__init__(table_row)
+
+    def __str__(self) -> str:
+        return "('" + self.regon + "','" + self.nazwa + "','" + self.nazwa_skrocona + "','" + self.powstanie + "','" + self.rozpoczecie_dzialalnosci + "','" + self.regon_wpis + "','" + self.zawieszenie + "','" + self.wznowienie + "','" + self.zatstnienie_zmiany + "','" + self.zakonczenie_dzialalnosci + "','" + self.skreslenie_regon + "','" + self.orzeczenie_upadlosci + "','" + self.zakonczenie_postepowania_upadlosciowego + "','" + self.kraj_symbol + "','" +self.wojewodztwo_symbol + "','" + self.powiat_symbol + "','" + self.gmina_symbol + "','" + self.kod_pocztowy + "','" + self.miejscowosc_poczty_symbol + "','" + self.miejscowosc_symbol + "','" + self.ulica_symbol + "','" + self.numer_nieruchomosci + "','" + self.numer_lokalu + "','" + self.nietypowe_miejsce_lokalizacji + "','" + self.numer_telefonu + "','" + self.numer_wewnetrzny_telefonu + "','" + "','" + self.numer_faksu + "','" + self.adres_strony_internetowej + "','" + self.gmina_nazwa + "','" + self.miejscowosc_nazwa + "','" + self.miejscowosc_poczty_nazwa + "','" + self.ulica_nazwa + "')"
+
+class F_rest(F_ceidg):
+    pass
 
 class common_LF(common_item):
     def __init__(self, table_row):

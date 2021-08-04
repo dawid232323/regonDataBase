@@ -369,10 +369,10 @@ proc_fiz_adSiedzUlica_Symbol varchar(10),proc_fiz_adSiedzNumerNieruchomosci varc
 proc_fiz_adSiedzNumerLokalu varchar(10), proc_fiz_adSiedzNietypoweMiejsceLokalizacji varchar(100),
 proc_fiz_numerTelefonu varchar(10), proc_fiz_numerWewnetrznyTelefonu varchar(10),
 proc_fiz_numerFaksu varchar(10), proc_fiz_adresStronyInternetowej varchar(35),
-proc_izC_dataWpisuDoRejestruEwidencji DATE, proc_fizC_dataSkresleniaZRejestruEwidencji DATE,
+proc_fizC_dataWpisuDoRejestruEwidencji DATE, proc_fizC_dataSkresleniaZRejestruEwidencji DATE,
 proc_fizC_numerWRejestrzeEwidencji DATE, proc_fizC_OrganRejestrowy_Symbol varchar(10),
 proc_fizC_RodzajRejestru_Symbol varchar(10), proc_fizC_NiePodjetoDzialalnosci varchar(15),
-proc_fiz_rodzajDzialalnosci varchar(100), proc_fiz_miejscowoscNazwa varchar(256),
+proc_fiz_miejscowoscNazwa varchar(256),
 proc_fiz_gminaNazwa varchar(256), proc_fiz_siedzPocztyNazwa varchar(256),
 proc_fiz_ulicaNazwa varchar(256), proc_fiz_organRejestrowyNazwa varchar(256),
 proc_fiz_rodzajRejestruNazwa varchar(256)
@@ -414,7 +414,7 @@ proc_fiz_rodzajRejestruNazwa varchar(256)
          proc_fiz_adSiedzMiejscowosc_Symbol, proc_fiz_adSiedzUlica_Symbol, proc_fiz_adSiedzNumerNieruchomosci,
          proc_fiz_adSiedzNumerLokalu, proc_fiz_adSiedzNietypoweMiejsceLokalizacji, proc_fiz_numerTelefonu,
          proc_fiz_numerWewnetrznyTelefonu, proc_fiz_numerFaksu, proc_fiz_adresStronyInternetowej,
-         proc_izC_dataWpisuDoRejestruEwidencji, proc_fizC_dataSkresleniaZRejestruEwidencji,
+         proc_fizC_dataWpisuDoRejestruEwidencji, proc_fizC_dataSkresleniaZRejestruEwidencji,
          proc_fizC_numerWRejestrzeEwidencji, proc_fizC_OrganRejestrowy_Symbol, proc_fizC_RodzajRejestru_Symbol,
          proc_fizC_NiePodjetoDzialalnosci, 'Ceidg');
     end;
@@ -434,7 +434,7 @@ proc_fiz_adSiedzUlica_Symbol varchar(10),proc_fiz_adSiedzNumerNieruchomosci varc
 proc_fiz_adSiedzNumerLokalu varchar(10), proc_fiz_adSiedzNietypoweMiejsceLokalizacji varchar(100),
 proc_fiz_numerTelefonu varchar(10), proc_fiz_numerWewnetrznyTelefonu varchar(10),
 proc_fiz_numerFaksu varchar(10), proc_fiz_adresStronyInternetowej varchar(35),
-proc_izC_dataWpisuDoRejestruEwidencji DATE,
+proc_fizC_dataWpisuDoRejestruEwidencji DATE, 
 proc_fizC_numerWRejestrzeEwidencji DATE, proc_fizC_OrganRejestrowy_Symbol varchar(10),
 proc_fizC_RodzajRejestru_Symbol varchar(10), proc_fiz_miejscowoscNazwa varchar(256),
 proc_fiz_gminaNazwa varchar(256), proc_fiz_siedzPocztyNazwa varchar(256),
@@ -478,7 +478,7 @@ proc_fiz_rodzajRejestruNazwa varchar(256)
          proc_fiz_adSiedzMiejscowosc_Symbol, proc_fiz_adSiedzUlica_Symbol, proc_fiz_adSiedzNumerNieruchomosci,
          proc_fiz_adSiedzNumerLokalu, proc_fiz_adSiedzNietypoweMiejsceLokalizacji, proc_fiz_numerTelefonu,
          proc_fiz_numerWewnetrznyTelefonu, proc_fiz_numerFaksu, proc_fiz_adresStronyInternetowej,
-         proc_izC_dataWpisuDoRejestruEwidencji, NULL,
+         proc_fizC_dataWpisuDoRejestruEwidencji, NULL,
          proc_fizC_numerWRejestrzeEwidencji, proc_fizC_OrganRejestrowy_Symbol, proc_fizC_RodzajRejestru_Symbol,
          NULL, 'Pozostala');
     end;
