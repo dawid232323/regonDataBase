@@ -353,3 +353,233 @@ proc_P_pkdPrzewazajace INT
         (proc_P_PkdRegon, proc_P_pkdKod, proc_P_pkdPrzewazajace);
     END;
 $$;
+
+CREATE OR REPLACE PROCEDURE insert_Ceidg(
+proc_fiz_regon varchar(9),proc_fiz_nazwa varchar(256),
+proc_fiz_nazwaSkrocona varchar(100), proc_fiz_dataPowstania DATE,
+proc_fiz_dataRozpoczeciaDzialanosci DATE, proc_fiz_dataWpisuDzialalnosciDoRegon DATE,
+proc_fiz_dataZawieszeniaDzialalnosci DATE, proc_fiz_dataWznowieniaDzialalnosci DATE,
+proc_fiz_dataZaistnieniaZmiany DATE, proc_fiz_dataZakonczeniaDzialalnosci DATE,
+proc_fiz_dataSkresleniaDzialalnosciZRegon DATE, proc_fiz_dataOrzeczeniaOUpadlosci DATE,
+proc_fiz_dataZakonczeniaPostepowaniaUpadlosciowego DATE, proc_fiz_adSiedzKraj_Symbol varchar(10),
+proc_fiz_adSiedzWojewodztwo_Symbol varchar(10), proc_fiz_adSiedzPowiat_Symbol varchar(10),
+proc_fiz_adSiedzGmina_Symbol varchar(10), proc_fiz_adSiedzKodPocztowy varchar(7),
+proc_fiz_adSiedzMiejscowoscPoczty_Symbol varchar(10), proc_fiz_adSiedzMiejscowosc_Symbol varchar(10),
+proc_fiz_adSiedzUlica_Symbol varchar(10),proc_fiz_adSiedzNumerNieruchomosci varchar(10),
+proc_fiz_adSiedzNumerLokalu varchar(10), proc_fiz_adSiedzNietypoweMiejsceLokalizacji varchar(100),
+proc_fiz_numerTelefonu varchar(10), proc_fiz_numerWewnetrznyTelefonu varchar(10),
+proc_fiz_numerFaksu varchar(10), proc_fiz_adresStronyInternetowej varchar(35),
+proc_izC_dataWpisuDoRejestruEwidencji DATE, proc_fizC_dataSkresleniaZRejestruEwidencji DATE,
+proc_fizC_numerWRejestrzeEwidencji DATE, proc_fizC_OrganRejestrowy_Symbol varchar(10),
+proc_fizC_RodzajRejestru_Symbol varchar(10), proc_fizC_NiePodjetoDzialalnosci varchar(15),
+proc_fiz_rodzajDzialalnosci varchar(100), proc_fiz_miejscowoscNazwa varchar(256),
+proc_fiz_gminaNazwa varchar(256), proc_fiz_siedzPocztyNazwa varchar(256),
+proc_fiz_ulicaNazwa varchar(256), proc_fiz_organRejestrowyNazwa varchar(256),
+proc_fiz_rodzajRejestruNazwa varchar(256)
+)LANGUAGE plpgsql AS $$
+    BEGIN
+        CALL insert_addresses(proc_fiz_adSiedzGmina_Symbol, proc_fiz_gminaNazwa,
+            proc_fiz_adSiedzMiejscowosc_Symbol, proc_fiz_miejscowoscNazwa,
+            proc_fiz_adSiedzMiejscowoscPoczty_Symbol, proc_fiz_siedzPocztyNazwa,
+            proc_fiz_adSiedzUlica_Symbol, proc_fiz_ulicaNazwa);
+        IF NOT EXISTS(SELECT * FROM registration_authorities WHERE organ_rejestrowy_symbol = proc_fizC_OrganRejestrowy_Symbol) AND
+           proc_fizC_OrganRejestrowy_Symbol IS NOT NULL THEN
+            INSERT INTO registration_authorities (organ_rejestrowy_symbol, organ_rejestrowy_nazwa) VALUES
+            (proc_fizC_OrganRejestrowy_Symbol, proc_fiz_organRejestrowyNazwa);
+        end if;
+        IF NOT EXISTS(SELECT * FROM register_types WHERE rodzajrejestru_symbol = proc_fizC_RodzajRejestru_Symbol) AND
+           proc_fizC_RodzajRejestru_Symbol IS NOT NULL THEN
+            INSERT INTO register_types (rodzajrejestru_symbol, rodzajrejestru_nazwa) VALUES
+            (proc_fizC_RodzajRejestru_Symbol, proc_fiz_rodzajRejestruNazwa);
+        end if;
+        INSERT INTO fizyczna_dzialalnosc_ceidg_i_pozostala (fiz_regon, fiz_nazwa, fiz_nazwaskrocona,
+        fiz_datapowstania, fiz_datarpozpoczeciadzialanosci, fiz_datawpisudzialalnoscidoregon,
+        fiz_datazawieszeniadzialalnosci, fiz_datawznowieniadzialalnosci, fiz_datazaistnieniazmiany,
+        fiz_datazakonczeniadzialalnosci, fiz_dataskresleniadzialalnoscizregon, fiz_dataorzeczeniaoupadlosci,
+        fiz_datazakonczeniapostepowaniaupadlosciowego, fiz_adsiedzkraj_symbol, fiz_adsiedzwojewodztwo_symbol,
+        fiz_adsiedzpowiat_symbol, fiz_adsiedzgmina_symbol, fiz_adsiedzkodpocztowy,
+        fiz_adsiedzmiejscowoscpoczty_symbol, fiz_adsiedzmiejscowosc_symbol, fiz_adsiedzulica_symbol,
+        fiz_adsiedznumernieruchomosci, fiz_adsiedznumerlokalu, fiz_adsiedznietypowemiejscelokalizacji,
+        fiz_numertelefonu, fiz_numerwewnetrznytelefonu, fiz_numerfaksu,
+        fiz_adresstronyinternetowej, fizc_datawpisudorejestruewidencji, fizc_dataskresleniazrejestruewidencji,
+        fizc_numerwrejestrzeewidencji, fizc_organrejestrowy_symbol, fizc_rodzajrejestru_symbol,
+        fizc_niepodjetodzialalnosci, fiz_rodzajdzialalnosci) VALUES
+        (proc_fiz_regon, proc_fiz_nazwa, proc_fiz_nazwaSkrocona, proc_fiz_dataPowstania,
+         proc_fiz_dataRozpoczeciaDzialanosci, proc_fiz_dataWpisuDzialalnosciDoRegon,
+         proc_fiz_dataZawieszeniaDzialalnosci, proc_fiz_dataWznowieniaDzialalnosci,
+         proc_fiz_dataZaistnieniaZmiany,proc_fiz_dataZakonczeniaDzialalnosci, proc_fiz_dataSkresleniaDzialalnosciZRegon,
+         proc_fiz_dataOrzeczeniaOUpadlosci, proc_fiz_dataZakonczeniaPostepowaniaUpadlosciowego,
+         proc_fiz_adSiedzKraj_Symbol, proc_fiz_adSiedzWojewodztwo_Symbol, proc_fiz_adSiedzPowiat_Symbol,
+         proc_fiz_adSiedzGmina_Symbol, proc_fiz_adSiedzKodPocztowy, proc_fiz_adSiedzMiejscowoscPoczty_Symbol,
+         proc_fiz_adSiedzMiejscowosc_Symbol, proc_fiz_adSiedzUlica_Symbol, proc_fiz_adSiedzNumerNieruchomosci,
+         proc_fiz_adSiedzNumerLokalu, proc_fiz_adSiedzNietypoweMiejsceLokalizacji, proc_fiz_numerTelefonu,
+         proc_fiz_numerWewnetrznyTelefonu, proc_fiz_numerFaksu, proc_fiz_adresStronyInternetowej,
+         proc_izC_dataWpisuDoRejestruEwidencji, proc_fizC_dataSkresleniaZRejestruEwidencji,
+         proc_fizC_numerWRejestrzeEwidencji, proc_fizC_OrganRejestrowy_Symbol, proc_fizC_RodzajRejestru_Symbol,
+         proc_fizC_NiePodjetoDzialalnosci, 'Ceidg');
+    end;
+$$
+CREATE OR REPLACE PROCEDURE insert_Pozostale(
+proc_fiz_regon varchar(9),proc_fiz_nazwa varchar(256),
+proc_fiz_nazwaSkrocona varchar(100), proc_fiz_dataPowstania DATE,
+proc_fiz_dataRozpoczeciaDzialanosci DATE, proc_fiz_dataWpisuDzialalnosciDoRegon DATE,
+proc_fiz_dataZawieszeniaDzialalnosci DATE, proc_fiz_dataWznowieniaDzialalnosci DATE,
+proc_fiz_dataZaistnieniaZmiany DATE, proc_fiz_dataZakonczeniaDzialalnosci DATE,
+proc_fiz_dataSkresleniaDzialalnosciZRegon DATE, proc_fiz_dataOrzeczeniaOUpadlosci DATE,
+proc_fiz_dataZakonczeniaPostepowaniaUpadlosciowego DATE, proc_fiz_adSiedzKraj_Symbol varchar(10),
+proc_fiz_adSiedzWojewodztwo_Symbol varchar(10), proc_fiz_adSiedzPowiat_Symbol varchar(10),
+proc_fiz_adSiedzGmina_Symbol varchar(10), proc_fiz_adSiedzKodPocztowy varchar(7),
+proc_fiz_adSiedzMiejscowoscPoczty_Symbol varchar(10), proc_fiz_adSiedzMiejscowosc_Symbol varchar(10),
+proc_fiz_adSiedzUlica_Symbol varchar(10),proc_fiz_adSiedzNumerNieruchomosci varchar(10),
+proc_fiz_adSiedzNumerLokalu varchar(10), proc_fiz_adSiedzNietypoweMiejsceLokalizacji varchar(100),
+proc_fiz_numerTelefonu varchar(10), proc_fiz_numerWewnetrznyTelefonu varchar(10),
+proc_fiz_numerFaksu varchar(10), proc_fiz_adresStronyInternetowej varchar(35),
+proc_izC_dataWpisuDoRejestruEwidencji DATE,
+proc_fizC_numerWRejestrzeEwidencji DATE, proc_fizC_OrganRejestrowy_Symbol varchar(10),
+proc_fizC_RodzajRejestru_Symbol varchar(10), proc_fiz_miejscowoscNazwa varchar(256),
+proc_fiz_gminaNazwa varchar(256), proc_fiz_siedzPocztyNazwa varchar(256),
+proc_fiz_ulicaNazwa varchar(256), proc_fiz_organRejestrowyNazwa varchar(256),
+proc_fiz_rodzajRejestruNazwa varchar(256)
+)LANGUAGE plpgsql AS $$
+    BEGIN
+        CALL insert_addresses(proc_fiz_adSiedzGmina_Symbol, proc_fiz_gminaNazwa,
+            proc_fiz_adSiedzMiejscowosc_Symbol, proc_fiz_miejscowoscNazwa,
+            proc_fiz_adSiedzMiejscowoscPoczty_Symbol, proc_fiz_siedzPocztyNazwa,
+            proc_fiz_adSiedzUlica_Symbol, proc_fiz_ulicaNazwa);
+        IF NOT EXISTS(SELECT * FROM registration_authorities WHERE organ_rejestrowy_symbol = proc_fizC_OrganRejestrowy_Symbol) AND
+           proc_fizC_OrganRejestrowy_Symbol IS NOT NULL THEN
+            INSERT INTO registration_authorities (organ_rejestrowy_symbol, organ_rejestrowy_nazwa) VALUES
+            (proc_fizC_OrganRejestrowy_Symbol, proc_fiz_organRejestrowyNazwa);
+        end if;
+        IF NOT EXISTS(SELECT * FROM register_types WHERE rodzajrejestru_symbol = proc_fizC_RodzajRejestru_Symbol) AND
+           proc_fizC_RodzajRejestru_Symbol IS NOT NULL THEN
+            INSERT INTO register_types (rodzajrejestru_symbol, rodzajrejestru_nazwa) VALUES
+            (proc_fizC_RodzajRejestru_Symbol, proc_fiz_rodzajRejestruNazwa);
+        end if;
+        INSERT INTO fizyczna_dzialalnosc_ceidg_i_pozostala (fiz_regon, fiz_nazwa, fiz_nazwaskrocona,
+        fiz_datapowstania, fiz_datarpozpoczeciadzialanosci, fiz_datawpisudzialalnoscidoregon,
+        fiz_datazawieszeniadzialalnosci, fiz_datawznowieniadzialalnosci, fiz_datazaistnieniazmiany,
+        fiz_datazakonczeniadzialalnosci, fiz_dataskresleniadzialalnoscizregon, fiz_dataorzeczeniaoupadlosci,
+        fiz_datazakonczeniapostepowaniaupadlosciowego, fiz_adsiedzkraj_symbol, fiz_adsiedzwojewodztwo_symbol,
+        fiz_adsiedzpowiat_symbol, fiz_adsiedzgmina_symbol, fiz_adsiedzkodpocztowy,
+        fiz_adsiedzmiejscowoscpoczty_symbol, fiz_adsiedzmiejscowosc_symbol, fiz_adsiedzulica_symbol,
+        fiz_adsiedznumernieruchomosci, fiz_adsiedznumerlokalu, fiz_adsiedznietypowemiejscelokalizacji,
+        fiz_numertelefonu, fiz_numerwewnetrznytelefonu, fiz_numerfaksu,
+        fiz_adresstronyinternetowej, fizc_datawpisudorejestruewidencji, fizc_dataskresleniazrejestruewidencji,
+        fizc_numerwrejestrzeewidencji, fizc_organrejestrowy_symbol, fizc_rodzajrejestru_symbol,
+        fizc_niepodjetodzialalnosci, fiz_rodzajdzialalnosci) VALUES
+        (proc_fiz_regon, proc_fiz_nazwa, proc_fiz_nazwaSkrocona, proc_fiz_dataPowstania,
+         proc_fiz_dataRozpoczeciaDzialanosci, proc_fiz_dataWpisuDzialalnosciDoRegon,
+         proc_fiz_dataZawieszeniaDzialalnosci, proc_fiz_dataWznowieniaDzialalnosci,
+         proc_fiz_dataZaistnieniaZmiany,proc_fiz_dataZakonczeniaDzialalnosci, proc_fiz_dataSkresleniaDzialalnosciZRegon,
+         proc_fiz_dataOrzeczeniaOUpadlosci, proc_fiz_dataZakonczeniaPostepowaniaUpadlosciowego,
+         proc_fiz_adSiedzKraj_Symbol, proc_fiz_adSiedzWojewodztwo_Symbol, proc_fiz_adSiedzPowiat_Symbol,
+         proc_fiz_adSiedzGmina_Symbol, proc_fiz_adSiedzKodPocztowy, proc_fiz_adSiedzMiejscowoscPoczty_Symbol,
+         proc_fiz_adSiedzMiejscowosc_Symbol, proc_fiz_adSiedzUlica_Symbol, proc_fiz_adSiedzNumerNieruchomosci,
+         proc_fiz_adSiedzNumerLokalu, proc_fiz_adSiedzNietypoweMiejsceLokalizacji, proc_fiz_numerTelefonu,
+         proc_fiz_numerWewnetrznyTelefonu, proc_fiz_numerFaksu, proc_fiz_adresStronyInternetowej,
+         proc_izC_dataWpisuDoRejestruEwidencji, NULL,
+         proc_fizC_numerWRejestrzeEwidencji, proc_fizC_OrganRejestrowy_Symbol, proc_fizC_RodzajRejestru_Symbol,
+         NULL, 'Pozostala');
+    end;
+$$;
+
+CREATE PROCEDURE insert_rolnicza(
+proc_fiz_regon varchar(9), proc_fiz_nazwa varchar(256), proc_fiz_nazwa_skrocona varchar(100),
+proc_fiz_dataPowstania DATE, proc_fiz_dataRozpoczeciaDzialalnosci DATE, proc_fiz_dataWpisuDzialalnosciDoRegon DATE,
+proc_fiz_dataZawieszeniaDzialalnosci DATE, proc_fiz_dataWznowieniaDzialalnosci DATE,
+proc_fiz_dataZaistnieniaZmianyDzialalnosci DATE, proc_fiz_dataZakonczeniaDzialalnosci DATE,
+proc_fiz_dataSkresleniaDzialalanosciZRegon DATE, proc_fiz_dataOrzeczeniaOUpadlosci DATE,
+proc_fiz_dataZakonczeniaPostepowaniaUpadlosciowego DATE, proc_fiz_adSiedzKraj_Symbol varchar(10),
+proc_fiz_adSiedzWojewodztwo_Symbol varchar(10), proc_fiz_adSiedzPowiat_Symbol varchar(10),
+proc_fiz_adSiedzGmina_Symbol varchar(10), proc_fiz_adSiedzKodPocztowy varchar(6),
+proc_fiz_adSiedzMiejscowoscPoczty_Symbol varchar(10), proc_fiz_adSiedzMiejscowosc_Symbol varchar(10),
+proc_fiz_adSiedzUlica_Symbol varchar(10), proc_fiz_adSiedzNumerNieruchomosci varchar(10),
+proc_fiz_adSiedzNumerLokalu varchar(10), proc_fiz_adSiedzNietypoweMiejsceLokalizacji varchar(256),
+proc_fiz_numerTelefonu varchar(10), proc_fiz_numerWewnetrznyTelefonu varchar(10),
+proc_fiz_numerFaksu varchar(10), proc_fiz_adresEmail varchar(20),
+proc_fiz_adresStronyinternetowej varchar(20), proc_fiz_gminaNazwa varchar(256),
+proc_fiz_miejscowoscNazwa varchar(256), proc_fiz_miejscowoscPocztyNazwa varchar(256),
+proc_fiz_ulicaNazwa varchar(256)
+)LANGUAGE plpgsql AS $$
+    BEGIN
+        CALL insert_addresses(proc_fiz_adSiedzGmina_Symbol, proc_fiz_gminaNazwa,
+            proc_fiz_adSiedzMiejscowosc_Symbol, proc_fiz_miejscowoscNazwa,
+            proc_fiz_adSiedzMiejscowoscPoczty_Symbol, proc_fiz_miejscowoscPocztyNazwa,
+            proc_fiz_adSiedzUlica_Symbol, proc_fiz_ulicaNazwa);
+    INSERT INTO fizycznadzialalnoscrolnicza (fiz_regon, fiz_nazwa, fiz_nazwa_skrocona, fiz_datapowstania,
+                                             fiz_datarozpoczeciadzialalnosci, fiz_datawpisudzialalnoscidoregon,
+                                             fiz_datazawieszeniadzialalnosci, fiz_datawznowieniadzialalnosci,
+                                             fiz_datazaistnieniazmianydzialalnosci, fiz_datazakonczeniadzialalnosci,
+                                             fiz_dataskresleniadzialalanoscizregon, fiz_dataorzeczeniaoupadlosci,
+                                             fiz_datazakonczeniapostepowaniaupadlosciowego, fiz_adsiedzkraj_symbol,
+                                             fiz_adsiedzwojewodztwo_symbol, fiz_adsiedzpowiat_symbol,
+                                             fiz_adsiedzgmina_symbol, fiz_adsiedzkodpocztowy, fiz_adsiedzmiejscowoscpoczty_symbol,
+                                             fiz_adsiedzmiejscowosc_symbol, fiz_adsiedzulica_symbol, fiz_adsiedznumernieruchomosci,
+                                             fiz_adsiedznumerlokalu, fiz_adsiedznietypowemiejscelokalizacji, fiz_numertelefonu,
+                                             fiz_numerwewnetrznytelefonu, fiz_numerfaksu, fiz_adresemail, fiz_adresstronyinternetowej) VALUES
+        (proc_fiz_regon, proc_fiz_nazwa, proc_fiz_nazwa_skrocona, proc_fiz_dataPowstania, proc_fiz_dataRozpoczeciaDzialalnosci,
+         proc_fiz_dataWpisuDzialalnosciDoRegon, proc_fiz_dataZawieszeniaDzialalnosci, proc_fiz_dataWznowieniaDzialalnosci,
+         proc_fiz_dataZaistnieniaZmianyDzialalnosci, proc_fiz_dataZakonczeniaDzialalnosci, proc_fiz_dataSkresleniaDzialalanosciZRegon,
+         proc_fiz_dataOrzeczeniaOUpadlosci, proc_fiz_dataZakonczeniaPostepowaniaUpadlosciowego, proc_fiz_adSiedzKraj_Symbol,
+         proc_fiz_adSiedzWojewodztwo_Symbol, proc_fiz_adSiedzPowiat_Symbol, proc_fiz_adSiedzGmina_Symbol, proc_fiz_adSiedzKodPocztowy,
+         proc_fiz_adSiedzMiejscowoscPoczty_Symbol, proc_fiz_adSiedzMiejscowosc_Symbol, proc_fiz_adSiedzUlica_Symbol,
+         proc_fiz_adSiedzNumerNieruchomosci, proc_fiz_adSiedzNumerLokalu, proc_fiz_adSiedzNietypoweMiejsceLokalizacji,
+         proc_fiz_numerTelefonu, proc_fiz_numerWewnetrznyTelefonu, proc_fiz_numerFaksu, proc_fiz_adresEmail, proc_fiz_adresStronyinternetowej);
+        end;
+$$;
+
+CREATE OR REPLACE PROCEDURE insert_Skreslone(
+    proc_fiz_regon varchar(9),
+    proc_fiz_nazwa varchar(256),
+    proc_fiz_nazwaSkrocona varchar(100),
+    proc_fiz_dataPowstania DATE,
+    proc_fiz_dataRozpoczeciaDzialalnosci DATE,
+    proc_fiz_dataWpisuDzialalnosciDoRegon DATE,
+    proc_fiz_dataZawieszeniaDzialalnosci DATE,
+    proc_fiz_dataWznowieniaDzialalnosci DATE,
+    proc_fiz_dataZaistnieniaZmianyDzialalnosci DATE,
+    proc_fiz_dataZakonczeniaDzialalnosci DATE,
+    proc_fiz_dataSkresleniaDzialalnosciZRegon DATE,
+    proc_fiz_adSiedzKraj_Symbol varchar(10),
+    proc_fiz_adSiedzWojewodztwo_Symbol varchar(10),
+    proc_fiz_adSiedzPowiat_Symbol varchar(10),
+    proc_fiz_adSiedzGmina_Symbol varchar(10), proc_fiz_gminaNazwa varchar(256),
+    proc_fiz_adSiedzKodPocztowy varchar(6),
+    proc_fiz_adSiedzMiejscowoscPoczty_Symbol varchar(10), proc_fiz_miejscowoscPocztyNazwa varchar(256),
+    proc_fiz_adSiedzMiejscowosc_Symbol varchar(10), proc_fiz_miejscowoscNazwa varchar(256),
+    proc_fiz_adSiedzUlica_Symbol varchar(10), proc_fiz_ulicaNazwa varchar(256),
+    proc_fiz_adSiedzNumerNieruchomosci varchar(10),
+    proc_fiz_adSiedzNumerLokalu varchar(10),
+    proc_fiz_adSiedzNietypoweMiejsceLokalizacji varchar(256),
+    proc_fiz_numerTelefonu varchar(10),
+    proc_fiz_numerWewnetrznyTelefonu varchar(10),
+    proc_fiz_numerFaksu varchar(10),
+    proc_fiz_adresEmail varchar(20),
+    proc_fiz_adresStronyinternetowej varchar(20)
+)LANGUAGE plpgsql AS $$
+    BEGIN
+        CALL insert_addresses(proc_fiz_adSiedzGmina_Symbol, proc_fiz_gminaNazwa,
+            proc_fiz_adSiedzMiejscowosc_Symbol, proc_fiz_miejscowoscNazwa,
+            proc_fiz_adSiedzMiejscowoscPoczty_Symbol, proc_fiz_miejscowoscPocztyNazwa,
+            proc_fiz_adSiedzUlica_Symbol, proc_fiz_ulicaNazwa);
+
+        INSERT INTO fizyczne_sreslone (fiz_regon, fiz_nazwa, fiz_nazwaskrocona,
+                                       fiz_datapowstania, fiz_datarozpoczeciadzialalnosci,
+                                       fiz_datawpisudzialalnoscidoregon, fiz_datazawieszeniadzialalnosci,
+                                       fiz_datawznowieniadzialalnosci, fiz_datazaistnieniazmianydzialalnosci,
+                                       fiz_datazakonczeniadzialalnosci, fiz_dataskresleniadzialalnoscizregon,
+                                       fiz_adsiedzkraj_symbol, fiz_adsiedzwojewodztwo_symbol, fiz_adsiedzpowiat_symbol,
+                                       fiz_adsiedzgmina_symbol, fiz_adsiedzkodpocztowy, fiz_adsiedzmiejscowoscpoczty_symbol,
+                                       fiz_adsiedzmiejscowosc_symbol, fiz_adsiedzulica_symbol, fiz_adsiedznumernieruchomosci,
+                                       fiz_adsiedznumerlokalu, fiz_adsiedznietypowemiejscelokalizacji, fiz_numertelefonu,
+                                       fiz_numerwewnetrznytelefonu, fiz_numerfaksu, fiz_adresemail, fiz_adresstronyinternetowej) VALUES
+        (proc_fiz_regon, proc_fiz_nazwa, proc_fiz_nazwaSkrocona, proc_fiz_dataPowstania, proc_fiz_dataRozpoczeciaDzialalnosci,
+         proc_fiz_dataWpisuDzialalnosciDoRegon, proc_fiz_dataZawieszeniaDzialalnosci, proc_fiz_dataWznowieniaDzialalnosci,
+         proc_fiz_dataZaistnieniaZmianyDzialalnosci, proc_fiz_dataZakonczeniaDzialalnosci, proc_fiz_dataSkresleniaDzialalnosciZRegon,
+         proc_fiz_adSiedzKraj_Symbol, proc_fiz_adSiedzWojewodztwo_Symbol, proc_fiz_adSiedzPowiat_Symbol, proc_fiz_adSiedzGmina_Symbol,
+         proc_fiz_adSiedzKodPocztowy, proc_fiz_adSiedzMiejscowoscPoczty_Symbol, proc_fiz_adSiedzMiejscowosc_Symbol, proc_fiz_adSiedzUlica_Symbol,
+         proc_fiz_adSiedzNumerNieruchomosci, proc_fiz_adSiedzNumerLokalu, proc_fiz_adSiedzNietypoweMiejsceLokalizacji, proc_fiz_numerTelefonu,
+         proc_fiz_numerWewnetrznyTelefonu, proc_fiz_numerFaksu, proc_fiz_adresEmail, proc_fiz_adresStronyinternetowej);
+    end;
+$$;

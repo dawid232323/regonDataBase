@@ -331,10 +331,10 @@ CREATE TABLE Fizyczna_Dzialalnosc_Ceidg_i_Pozostala(
     CONSTRAINT fk_ceidg_town FOREIGN KEY (fiz_adSiedzMiejscowosc_Symbol) REFERENCES towns(siedz_miejscowosc_symbol),
     CONSTRAINT fk_ceidg_post FOREIGN KEY (fiz_adSiedzMiejscowoscPoczty_Symbol) REFERENCES posts(siedz_miejscowosc_poczty_symbol),
     CONSTRAINT fk_ceidg_street FOREIGN KEY (fiz_adSiedzUlica_Symbol) REFERENCES streets(siedz_ulica_symbol),
-    CONSTRAINT fk_ceidg_register_authorities FOREIGN KEY (fizC_OrganRejestrowy_Symbol) REFERENCES registration_authorities(organ_rejestrowy_symbol)
+    CONSTRAINT fk_ceidg_register_authorities FOREIGN KEY (fizC_OrganRejestrowy_Symbol) REFERENCES registration_authorities(organ_rejestrowy_symbol),
+    CONSTRAINT fk_registerType FOREIGN KEY (fizC_RodzajRejestru_Symbol) REFERENCES register_types(rodzajRejestru_Symbol)
 
-
-);
+); -- created
 
 CREATE TABLE FizycznaDzialalnoscRolnicza(
     id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -374,7 +374,7 @@ CREATE TABLE FizycznaDzialalnoscRolnicza(
     CONSTRAINT fk_agr_post FOREIGN KEY (fiz_adSiedzMiejscowoscPoczty_Symbol) REFERENCES posts(siedz_miejscowosc_poczty_symbol),
     CONSTRAINT fk_agr_street FOREIGN KEY (fiz_adSiedzUlica_Symbol) REFERENCES streets(siedz_ulica_symbol)
 
-);
+); -- created
 
 CREATE TABLE Fizyczne_Sreslone(
     id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -412,4 +412,4 @@ CREATE TABLE Fizyczne_Sreslone(
     CONSTRAINT fk_del_post FOREIGN KEY (fiz_adSiedzMiejscowoscPoczty_Symbol) REFERENCES posts(siedz_miejscowosc_poczty_symbol),
     CONSTRAINT fk_del_street FOREIGN KEY (fiz_adSiedzUlica_Symbol) REFERENCES streets(siedz_ulica_symbol)
 
-)
+) -- created
