@@ -405,6 +405,7 @@ CREATE TABLE Fizyczne_Sreslone(
     fiz_numerFaksu varchar(10),
     fiz_adresEmail varchar(20),
     fiz_adresStronyinternetowej varchar(20),
+    fiz_adresEmail2 varchar(20),
     CONSTRAINT fk_del_kraj FOREIGN KEY (fiz_adSiedzKraj_Symbol) REFERENCES countries(siedz_kraj_symbol),
     CONSTRAINT fk_del_powiat FOREIGN KEY (fiz_adSiedzPowiat_Symbol) REFERENCES counties(siedz_powiat_symbol),
     CONSTRAINT fk_del_gmina FOREIGN KEY (fiz_adSiedzGmina_Symbol) REFERENCES municipalities(siedz_gmina_symbol),
