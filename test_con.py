@@ -4,21 +4,25 @@ import psycopg2
 import insert
 import traceback
 
-connection = psycopg2.connect(host = 'localhost', database = 'p1495_regon_base', user = 'p1495_regon_base', password= 'R!(gR(A2pEyOj(8N5iZN', port = 8543)
-cursor = connection.cursor()
+# connection = psycopg2.connect(host = 'localhost', database = 'p1495_regon_base', user = 'p1495_regon_base', password= 'R!(gR(A2pEyOj(8N5iZN', port = 8543)
+# cursor = connection.cursor()
 print('connected')
-file = open('tests/commonLP1.csv')
+file = open('tests/common_P1.csv')
 reader = csv.reader(file, delimiter=';')
 title = next(reader)
 i = 0
-while i < 5:
+while i < 57:
     row = next(reader) 
     i +=1    
 row = next(reader)
-item = str(insert.local_P(row))
+item = str(insert.common_P_item(row))
 print(item)
 item = item.replace("''", 'NULL')
-command = "CALL insert_into_common_LP" + item
+# tab = item.split(',')
+# for it in tab:
+#     if len(it[1:-1]) > 10:
+#         print(it)
+command = "CALL insert_into_common_P" + item
 print(command)
 # try:
 #     cursor.execute(command)
