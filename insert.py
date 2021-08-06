@@ -3,6 +3,7 @@ import traceback
 import csv
 import time
 from datetime import date
+from abc import ABC, ABCMeta, abstractmethod
 
 class common_item():
     def __init__(self, regon, nip, nip_status, regon_wpis, regon_zmiana, regon_skreslenie, podstawowa_forma_prawna, szczegolna_forma_prawna, forma_finansowania, forma_wlasnosci):
@@ -84,6 +85,12 @@ class common_F(common_item):
         self.forma_wlasnosci_nazwa = table_row[16]
 
     def __str__(self) -> str:
+        if self.dzialalnosc_rolnicza == '1':
+            self.dzialalnosc_rolnicza = '2'
+        if self.dzialalnosc_skreslona_do_20141108 == '1':
+            self.dzialalnosc_skreslona_do_20141108 = '4'
+        if self.dzialalnosc_pozostala == '1':
+            self.dzialalnosc_pozostala = '3'
         return "('" + self.regon + "','" + self.nip + "','" + self.status_nip + "','" + self.nazwisko + "','" + self.imie1 + "','" + self.imie2 + "','" + self.data_wpisu_do_regon + "','" + self.data_zaistnienia_zmiany + "','" + self.data_skreslenia_z_regon + "','" + self.podstawowa_forma_prawna + "','" + self.podstawowa_forma_prawna_nazwa + "','" + self.szczegolna_forma_prawna + "','" + self.szczegolna_forma_prawna_nazwa + "','" + self.forma_finansowania + "','" + self.forma_finansowania_nazwa + "','" + self.forma_wlasnosci + "','" + self.forma_wlasnosci_nazwa +  "'," + self.dzialalnosc_CEIDG + "," + self.dzialalnosc_rolnicza + "," + self.dzialalnosc_pozostala + "," + self.dzialalnosc_skreslona_do_20141108 + "," + self.liczba_jednostek_lokalnych + ",'" + str(date.today()) + "')"
 
 class F_specified_item():
@@ -296,6 +303,50 @@ class summary_item():
     def __str__(self):
         return '("' + self.index+'","'+ self.regon + '","' + self.type + '","' + self.name + '","' + self.state + '","' + self.county + '","' + self.municipality + '","' + self.postal_code + '","' + self.post + '","' + self.city + '","' + self.street + '","' + self.appartment + '",' + self.exit_regon + ')'
 
+class pkd_item(metaclass=ABCMeta):
+    @abstractmethod
+    def __init__(self, table_row) -> None:
+        self.regon = table_row[0]
+        self.pkd_kod = table_row[1]
+        self.pkd_nazwa = table_row[2]
+        self.pkd_przewazajace = table_row[3]
+    
+    @abstractmethod
+    def __str__(self) -> str:
+        return "('" + self.regon + "','" + self.pkd_kod + "','" + self.pkd_nazwa + "'," + self.pkd_przewazajace
+
+class pkd_F_item(pkd_item):
+    def __init__(self, table_row) -> None:
+        super().__init__(table_row)
+        self.silos_id = table_row[4]
+        self.silos_symbol = table_row[5]
+        self.data_skreslenia = table_row[6]
+
+    def __str__(self) -> str:
+        return super().__str__() + "," + self.silos_id + ",'" + self.silos_symbol + "','" + self.data_skreslenia + "')"
+
+class pkd_LF_item(pkd_item):
+    def __init__(self, table_row) -> None:
+        super().__init__(table_row)
+        self.silos_Nazwa = table_row[4]
+
+    def __str__(self) -> str:
+        return super().__str__() + ",'" + self.silos_Nazwa + "')"
+
+class pkd_LP_item(pkd_item):
+    def __init__(self, table_row) -> None:
+        super().__init__(table_row)
+
+    def __str__(self) -> str:
+        return super().__str__() + ")"
+
+class pkd_P_item(pkd_item):
+    def __init__(self, table_row) -> None:
+        super().__init__(table_row)
+
+    def __str__(self) -> str:
+        return super().__str__() + ")"
+
 class file_handler():
     def __init__(self, file_name):
       self.file = file_name
@@ -335,6 +386,26 @@ class data_inserter():
             return str(common_P_item(table_row)).replace("''", 'NULL')
         elif self.mode == 'CF':
             return str(common_F(table_row)).replace("''", 'NULL')
+        elif self.mode == 'CLF':
+            return str(local_F(table_row)).replace("''", 'NULL')
+        elif self.mode == 'CLP':
+            return str(local_P(table_row)).replace("''", 'NULL')
+        elif self.mode == 'cdeigF':
+            return str(F_ceidg(table_row)).replace("''", 'NULL')
+        elif self.mode == 'agrF':
+            return str(F_agriculture(table_row)).replace("''", 'NULL')
+        elif self.mode == 'restF':
+            return str(F_rest(table_row)).replace("''", 'NULL')
+        elif self.mode == 'delF':
+            return str(F_deleted(table_row)).replace("''", 'NULL')
+        elif self.mode == 'pkdP':
+            return str(pkd_P_item(table_row)).replace("''", 'NULL')
+        elif self.mode == 'pkdF':
+            return str(pkd_F_item(table_row)).replace("''", 'NULL')
+        elif self.mode == 'pkdLP':
+            return str(pkd_LP_item(table_row)).replace("''", 'NULL')
+        elif self.mode == 'pkdLF':
+            return str(pkd_LF_item(table_row)).replace("''", 'NULL')
 
     def data_looper(self):
         title = next(self.file_handler.read_rows())
@@ -352,7 +423,7 @@ class data_inserter():
 
 
 def main():
-    db = data_inserter('CF', 'tests/commonF1.csv')
+    db = data_inserter('CP', 'tests/common_P1.csv')
     db.data_looper()
     
 

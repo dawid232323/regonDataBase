@@ -134,13 +134,17 @@ CREATE TABLE common_F(
     fiz_dzialanoscCeidg INT,
     fiz_dzialnoscRolnicza INT,
     fiz_dzialanoscPozostala INT,
-    fiz_dzialanoscSkreslonaDo20141108 INT CHECK (fiz_dzialanoscSkreslonaDo20141108 IN (0, 1)),
+    fiz_dzialanoscSkreslonaDo20141108 INT,
     fiz_liczbaJednLokalnych INT,
     fiz_dataWpisuDoBazyDanych DATE,
     CONSTRAINT fk_podstawowaFormaPrawna_Symbol FOREIGN KEY (fiz_podstawowaFormaPrawna_Symbol) REFERENCES basic_legal_form(podstawowa_forma_prawna_symbol),
     CONSTRAINT fk_szczegolnaFormaPrawnaSymbol FOREIGN KEY (fiz_szczegolnaFormaPrawna_Symbol) REFERENCES specific_legal_form(szczegolna_forma_prawna_symbol),
     CONSTRAINT fk_formaFinansowania_Symbol FOREIGN KEY (fiz_formaFinansowania_Symbol) REFERENCES forms_of_financing(forma_finansowania_symbol),
-    CONSTRAINT fk_formaWlasnosci_Symbol FOREIGN KEY (fiz_formaWlasnosci_Symbol) REFERENCES forms_of_ownership(forma_wlasnosci_symbol)
+    CONSTRAINT fk_formaWlasnosci_Symbol FOREIGN KEY (fiz_formaWlasnosci_Symbol) REFERENCES forms_of_ownership(forma_wlasnosci_symbol),
+    CONSTRAINT fk_dzialalnoscCeidg FOREIGN KEY (fiz_dzialanoscCeidg) REFERENCES silos(silosID),
+    CONSTRAINT fk_dzialalnoscRolnicza FOREIGN KEY (fiz_dzialnoscRolnicza) REFERENCES silos(silosID),
+    CONSTRAINT fk_dzialalnoscPozostala FOREIGN KEY (fiz_dzialanoscPozostala) REFERENCES silos(silosID),
+    CONSTRAINT fk_dzialalnoscSkreslona Foreign Key (fiz_dzialanoscSkreslonaDo20141108) REFERENCES silos(silosID)
     --CONSTRAINT fk_regon FOREIGN KEY (fiz_regon) REFERENCES summary_data(regon)
 ); --created
 
@@ -256,6 +260,7 @@ CREATE TABLE pkd_F_ownership(
     fiz_pkd_Kod varchar(10) NOT NULL,
     fiz_pkd_Przewazajace INT,
     fiz_pkd_SilosID INT,
+    fiz_pkd_dataSkreslenia DATE,
     CONSTRAINT pk_pkd_F_ovnership PRIMARY KEY (fiz_pkd_regon, fiz_pkd_Kod),
     CONSTRAINT fk_pkd_Kod FOREIGN KEY (fiz_pkd_Kod) REFERENCES pkds(pkd_Kod),
     CONSTRAINT fk_silos FOREIGN KEY (fiz_pkd_SilosID) REFERENCES silos(silosID)

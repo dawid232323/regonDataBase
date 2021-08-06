@@ -7,6 +7,8 @@ CREATE OR REPLACE FUNCTION get_parent_regon(long_regon varchar(14)) RETURNS varc
     end;
     $parent_regon$ LANGUAGE plpgsql; -- created
 
+
+
 CREATE OR REPLACE PROCEDURE insert_addresses(
 municipality_symbol varchar(10), municipality_name varchar(256), town_symbol varchar(10),
 town_name varchar(256), post_symbol varchar(10), post_name varchar(256), street_symbol varchar(10),
@@ -78,7 +80,7 @@ CREATE OR REPLACE PROCEDURE insert_into_common_P(
     proc_formaWlasnosci_Symbol varchar(10) DEFAULT NULL,
      praw_formaWlasnosci_nazwa varchar(256) DEFAULT NULL,
     proc_organZalozycielski varchar(10) DEFAULT NULL,
-     organZalozycielski_nazwa varchar(256) DEFAULT NULL,
+     proc_organZalozycielski_nazwa varchar(256) DEFAULT NULL,
     proc_organRejestrowy_Symbol varchar(10) DEFAULT NULL,
      organRejestrowy_nazwa varchar(256) DEFAULT NULL,
     proc_rodzajRejestruEwidencji_SYmbol varchar(10) DEFAULT NULL,
@@ -107,7 +109,7 @@ begin
     end if;
     IF NOT EXISTS(SELECT * FROM founding_bodies WHERE ogran_zalozycielski_symbol = proc_organZalozycielski)
         AND proc_organZalozycielski IS NOT NULL THEN
-        INSERT INTO founding_bodies (ogran_zalozycielski_symbol, organ_zalozycielski_nazwa) VALUES (proc_organRejestrowy_Symbol, organZalozycielski_nazwa);
+        INSERT INTO founding_bodies (ogran_zalozycielski_symbol, organ_zalozycielski_nazwa) VALUES (proc_organZalozycielski, proc_organZalozycielski_nazwa);
     end if;
     IF NOT EXISTS(SELECT * FROM forms_of_ownership WHERE forma_wlasnosci_symbol = proc_formaWlasnosci_Symbol)
         AND proc_formaWlasnosci_Symbol IS NOT NULL THEN
@@ -144,7 +146,6 @@ begin
 
 end;
     $$; -- created
-
 CREATE OR REPLACE PROCEDURE insert_into_common_F(
 fproc_regon varchar(9), fproc_nip varchar(10), fproc_statusNIP varchar(10), fproc_nazwisko varchar(100), fproc_imie1 varchar(100), fproc_imie2 varchar(10),
 fproc_dataWpisuDoRegon DATE, fproc_dataZaistnieniaZmiany DATE, fproc_dataSkresleniaPodmiotuZRegon DATE, fproc_podstawowaFormaPrawna_Symbol varchar(10),
@@ -317,7 +318,7 @@ LANGUAGE plpgsql AS $$
     $$;
 
 CREATE OR REPLACE PROCEDURE insert_into_pkd_F_ownership(proc_pkdF_regon varchar(9), proc_pkdF_kod varchar(10), proc_pkdF_pkdNazwa varchar(256),
-proc_pkdF_Przewazajace INT, proc_pkdF_SilosID INT) LANGUAGE plpgsql AS $$
+proc_pkdF_Przewazajace INT, proc_pkdF_SilosID INT, proc_pkdF_SilosNazwa varchar(30), proc_pkdF_dataSkreslenia DATE) LANGUAGE plpgsql AS $$
     BEGIN
     IF NOT EXISTS(SELECT * FROM pkds WHERE pkd_kod = proc_pkdF_kod) THEN
         INSERT INTO pkds (pkd_kod, pkd_nazwa) VALUES
@@ -325,10 +326,10 @@ proc_pkdF_Przewazajace INT, proc_pkdF_SilosID INT) LANGUAGE plpgsql AS $$
     end if;
     IF NOT EXISTS(SELECT * FROM silos WHERE silosid = proc_pkdF_SilosID) THEN
         INSERT INTO silos (silosid, silos_nazwa) VALUES
-        (proc_pkdF_SilosID, proc_pkdF_pkdNazwa);
+        (proc_pkdF_SilosID, proc_pkdF_SilosNazwa);
     end if;
-    INSERT INTO pkd_f_ownership (fiz_pkd_regon, fiz_pkd_kod, fiz_pkd_przewazajace, fiz_pkd_silosid) VALUES
-        (proc_pkdF_regon, proc_pkdF_kod, proc_pkdF_Przewazajace, proc_pkdF_SilosID);
+    INSERT INTO pkd_f_ownership (fiz_pkd_regon, fiz_pkd_kod, fiz_pkd_przewazajace, fiz_pkd_silosid, fiz_pkd_dataskreslenia) VALUES
+        (proc_pkdF_regon, proc_pkdF_kod, proc_pkdF_Przewazajace, proc_pkdF_SilosID, proc_pkdF_dataSkreslenia);
 end;
 $$; -- created
 
