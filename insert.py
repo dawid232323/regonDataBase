@@ -69,18 +69,22 @@ class common_P_item(common_item): #version for files with index column
 
 class common_F(common_item):
     def __init__(self, table_row):
-        super(common_P_item, self).__init__(regon=table_row[1], nip=table_row[2], nip_status=table_row[3], regon_wpis=table_row[7], regon_zmiana=table_row[8], regon_skreslenie=table_row[9], podstawowa_forma_prawna=table_row[10], szczegolna_forma_prawna=table_row[11], forma_finansowania=table_row[12], forma_wlasnosci=table_row[13])
-        self.nazwisko = table_row[4]
-        self.imie1 = table_row[5]
-        self.imie2 = table_row[6]
-        self.dzialalnosc_CEIDG = table_row[18]
-        self.dzialalnosc_rolnicza = table_row[19]
-        self.dzialalnosc_pozostala = table_row[20]
-        self.dzialalnosc_skreslona_do_20141108 = table_row[21]
-        self.liczba_jednostek_lokalnych = table_row[22]
-    
-    def __str__(self):
-        return "('" + self.regon + "','" + self.nip + "','" + self.status_nip + "','" + self.nazwisko + "','" + self.imie1 + '','' + self.imie2 + "','" + self.data_wpisu_do_regon + "','" + self.data_zaistnienia_zmiany + "','" + self.data_skreslenia_z_regon + "','" + self.podstawowa_forma_prawna + "'.'" + self.szczegolna_forma_prawna + "','" + self.forma_finansowania + "','" + self.forma_wlasnosci + "'," + self.dzialalnosc_CEIDG + "," + self.dzialalnosc_rolnicza + ',' + self.dzialalnosc_pozostala + ',' + self.dzialalnosc_skreslona_do_20141108 + ',' + self.liczba_jednostek_lokalnych + ')'
+        super().__init__(regon=table_row[0], nip=table_row[1], nip_status=table_row[2], regon_wpis=table_row[6], regon_zmiana=table_row[7], regon_skreslenie=table_row[8], podstawowa_forma_prawna=table_row[9], szczegolna_forma_prawna=table_row[10], forma_finansowania=table_row[11], forma_wlasnosci=table_row[12])
+        self.nazwisko = table_row[3]
+        self.imie1 = table_row[4]
+        self.imie2 = table_row[5]
+        self.dzialalnosc_CEIDG = table_row[17]
+        self.dzialalnosc_rolnicza = table_row[18]
+        self.dzialalnosc_pozostala = table_row[19]
+        self.dzialalnosc_skreslona_do_20141108 = table_row[20]
+        self.liczba_jednostek_lokalnych = table_row[21]
+        self.podstawowa_forma_prawna_nazwa = table_row[13]
+        self.szczegolna_forma_prawna_nazwa = table_row[14]
+        self.forma_finansowania_nazwa = table_row[15]
+        self.forma_wlasnosci_nazwa = table_row[16]
+
+    def __str__(self) -> str:
+        return "('" + self.regon + "','" + self.nip + "','" + self.status_nip + "','" + self.nazwisko + "','" + self.imie1 + "','" + self.imie2 + "','" + self.data_wpisu_do_regon + "','" + self.data_zaistnienia_zmiany + "','" + self.data_skreslenia_z_regon + "','" + self.podstawowa_forma_prawna + "','" + self.podstawowa_forma_prawna_nazwa + "','" + self.szczegolna_forma_prawna + "','" + self.szczegolna_forma_prawna_nazwa + "','" + self.forma_finansowania + "','" + self.forma_finansowania_nazwa + "','" + self.forma_wlasnosci + "','" + self.forma_wlasnosci_nazwa +  "'," + self.dzialalnosc_CEIDG + "," + self.dzialalnosc_rolnicza + "," + self.dzialalnosc_pozostala + "," + self.dzialalnosc_skreslona_do_20141108 + "," + self.liczba_jednostek_lokalnych + ",'" + str(date.today()) + "')"
 
 class F_specified_item():
     def __init__(self, table_row) -> None:
@@ -302,44 +306,54 @@ class file_handler():
             csv_reader = csv.reader(csv_file, delimiter = ';')
             for row in csv_reader:
                 yield row
-    def write_exceptions(self):
+    def write_exceptions(self): #function that will save all records that failed to insert
         pass
 
 class data_base_connector():
-    def __init__(self, filer):
+    def __init__(self):
         try:
             self.conn = psycopg2.connect(host = 'localhost', database = 'p1495_regon_base', user = 'p1495_regon_base', password= 'R!(gR(A2pEyOj(8N5iZN', port = 8543)
             self.cur = self.conn.cursor()
             print('Connected to DataBase')
         except Exception:
             traceback.print_exc()
-        self.file_handler = filer
         
-    def inserting_summary_data(self):
-        for row in self.file_handler.read_rows():
-            command = "INSERT INTO summary_data VALUES " + str(summary_item(row))
+    def get_conn_details(self):
+        return self.conn, self.cur
+
+class data_inserter():
+    def __init__(self, mode, file_name):
+        self.connection, self.cursor = data_base_connector().get_conn_details()
+        self.mode = mode
+        self.data_types = {'CP':'insert_into_common_P', 'CF':'insert_into_common_F', 'CLP':'insert_into_common_LP', 
+        'CLF':'insert_into_common_LF', 'cdeigF':'insert_Ceidg', 'agrF':'insert_rolnicza', 'restF':'insert_Pozostale',
+        'delF':'insert_Skreslone', 'pkdP':'insert_into_pkd_P_ownership', 'pkdF':'insert_into_pkd_F_ownership', 'pkdLP': 'insert_into_pkd_LP_ownership', 'pkdLF': 'insert_into_pkd_LF_ownership'}
+        self.file_handler = file_handler(file_name)
+
+    def row_creator(self, table_row) -> str:
+        if self.mode == 'CP':
+            return str(common_P_item(table_row)).replace("''", 'NULL')
+        elif self.mode == 'CF':
+            return str(common_F(table_row)).replace("''", 'NULL')
+
+    def data_looper(self):
+        title = next(self.file_handler.read_rows())
+        for table_row in self.file_handler.read_rows():
+            row = self.row_creator(table_row)
+            command = 'CALL ' + self.data_types[self.mode] + row
             print(command)
-    
-    def inserting_counties(self):
-        for row in self.file_handler.read_rows():
-            command = "INSERT INTO counties (siedz_powiat_symbol, siedz_powiat_nazwa) VALUES " + str(county_item(row))
-            if row[0] != 'id':
-                try:
-                    self.cur.execute(command)
-                    self.conn.commit()
-                    print('done')
-                    time.sleep(0.5)
-                except Exception as ex:
-                    print(ex)
-                    self.conn.rollback()
+            try:
+                self.cursor.execute(command)
+                self.connection.commit()
+            except Exception:
+                self.file_handler.write_exceptions()
+                traceback.print_exc()
+                self.connection.rollback()
+
 
 def main():
-    name = '/Users/dawidpylak/Documents/Projekty Xcode i Inne/Scrapping/county_list.csv'   #input('type file name')
-    fHandler = file_handler(name)
-    # fHandler.print_rows()
-    db = data_base_connector(fHandler)
-    db.inserting_counties()
-    
+    db = data_inserter('CF', 'tests/commonF1.csv')
+    db.data_looper()
     
 
 if __name__ == '__main__':
