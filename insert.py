@@ -350,15 +350,17 @@ class pkd_P_item(pkd_item):
 class file_handler():
     def __init__(self, file_name):
       self.file = file_name
-      self.exceptions_file = open('exceptions.txt', 'a')
+      self.exceptions_file = open('exceptions.csv', 'a')
+      self.writer = csv.writer(self.exceptions_file, delimiter = ';')
+      self.writer.writerow('Regon', 'Type of raport')
 
     def read_rows(self):
         with open(self.file) as csv_file:
             csv_reader = csv.reader(csv_file, delimiter = ';')
             for row in csv_reader:
                 yield row
-    def write_exceptions(self): #function that will save all records that failed to insert
-        pass
+    def write_exceptions(self, mode, regon): #function that will save all records that failed to insert
+        self.writer.writerow(regon, mode)
 
 class data_base_connector():
     def __init__(self):
@@ -417,7 +419,7 @@ class data_inserter():
                 self.cursor.execute(command)
                 self.connection.commit()
             except Exception:
-                self.file_handler.write_exceptions()
+                self.file_handler.write_exceptions(self.mode, table_row[0])
                 traceback.print_exc()
                 self.connection.rollback()
 
