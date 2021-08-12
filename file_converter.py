@@ -5,7 +5,6 @@ class converter():
     def __init__(self, directory_path):
         self.file_list = os.listdir(directory_path)
         os.chdir(directory_path)
-        print('file list is ', self.file_list)
         self.directory_path = directory_path
 
     def convert(self):
@@ -18,8 +17,7 @@ class converter():
                     continue
                 file_name = file_name.replace('.xlsx', '')
                 name = self.directory_path + '/' + file_name + '.csv'
-                print(f'name is {name}')
-                read_file.to_csv(name, index=None, header=True)
+                read_file.to_csv(name, index=None, header=False, sep=';')
 
 
 def main():

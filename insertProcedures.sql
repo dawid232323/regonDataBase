@@ -160,7 +160,7 @@ fproc_dzialalnoscPozostala INT, fproc_dzialalnoscSkreslona INT, fproc_liczbaJedn
             (fproc_podstawowaFormaPrawna_Symbol, fproc_podstawowaFormaPrawna_Nazwa);
         end if;
         IF NOT EXISTS(SELECT * FROM specific_legal_form WHERE szczegolna_forma_prawna_symbol = fproc_szczegolnaFormaPrawna_Symbol)
-            AND fproc_podstawowaFormaPrawna_Symbol IS NOT NULL THEN
+            AND fproc_szczegolnaFormaPrawna_Symbol IS NOT NULL THEN
             INSERT INTO specific_legal_form (szczegolna_forma_prawna_symbol, szeczgolna_forma_prawna_nazwa) VALUES
             (fproc_szczegolnaFormaPrawna_Symbol, fproc_szczegolnaFormaPrawna_Nazwa);
         end if;
@@ -187,16 +187,17 @@ fproc_dzialalnoscPozostala INT, fproc_dzialalnoscSkreslona INT, fproc_liczbaJedn
     end;
     $$; -- created
 
-
+DROP PROCEDURE insert_into_common_lp(proc_lokpraw_regon varchar, proc_lokpraw_nazwa varchar, proc_lokpraw_numerwrejestrzeewiddencji varchar, proc_lokpraw_datawpisudorejestruewidencji date, proc_lokpraw_datapowstania date, proc_lokpraw_datarozpoczeciadzialalnosci date, proc_lokpraw_datawpisudoregon date, proc_lokpraw_datazawieszeniadzialanosci date, proc_lokpraw_datawznowieniadzialanosci date, proc_lokpraw_datazaistnieniazmiany date, proc_lokpraw_datazakonczeniadzialanosci date, proc_lokpraw_dataskresleniazregon date, proc_lokpraw_siedzkraj_symbol varchar, proc_lokpraw_siedzwojewodztwo_symbol varchar, proc_lokpraw_siedzpowiat_symbol varchar, proc_lokpraw_siedzgmina_symbol varchar, proc_lokpraw_siedzgmina_nazwa varchar, proc_lokpraw_siedzmiejscowoscpoczty_symbol varchar, proc_lokpraw_siedzmiejscowoscpoczty_nazwa varchar, proc_lokpraw_siedzmiejscowosc_symbol varchar, proc_lokpraw_siedzmiejscowosc_nazwa varchar, proc_lokpraw_siedzulica_symbol varchar, proc_lokpraw_siedzulica_nazwa varchar, proc_lokpraw_siedzkodpocztowy varchar, proc_lokpraw_siedznumernieruchomosci varchar, proc_lokpraw_siedznumerlokalu varchar, proc_lokpraw_siedznietypowemiejscelokalizacji varchar, proc_lokpraw_formafinansowania_symbol varchar, proc_lokpraw_formafinansowania_nazwa varchar, proc_lokpraw_organrejestrowy_symbol varchar, proc_lokpraw_organrejestrowy_nazwa varchar, proc_lokpraw_rodzajrejestruewidencji_symbol varchar, proc_lokpraw_rodzajrejestruewidencji_nazwa varchar, proc_lokpraw_datawpisudobazydanych date);
 CREATE OR REPLACE PROCEDURE insert_into_common_LP(proc_lokpraw_regon varchar(14), --proc_lokpraw_parentRegon varchar(9),
     proc_lokpraw_nazwa varchar(256), proc_lokpraw_numerWRejestrzeEwiddencji varchar(10), proc_lokpraw_dataWpisuDoRejestruEwidencji DATE,
     proc_lokpraw_dataPowstania DATE, proc_lokpraw_dataRozpoczeciaDzialalnosci DATE, proc_lokpraw_dataWpisuDoRegon DATE,
     proc_lokpraw_dataZawieszeniaDzialanosci DATE, proc_lokpraw_dataWznowieniaDzialanosci DATE, proc_lokpraw_dataZaistnieniaZmiany DATE,
     proc_lokpraw_dataZakonczeniaDzialanosci DATE, proc_lokpraw_dataSkresleniaZRegon DATE, proc_lokpraw_siedzKraj_Symbol varchar(10),
     proc_lokpraw_siedzWojewodztwo_Symbol varchar(10), proc_lokpraw_siedzPowiat_Symbol varchar(10), proc_lokpraw_siedzGmina_Symbol varchar(10),
-    proc_lokpraw_siedzGmina_Nazwa varchar(256), proc_lokpraw_siedzMiejscowoscPoczty_Symbol varchar(10), proc_lokpraw_siedzMiejscowoscPoczty_Nazwa varchar(256), proc_lokpraw_siedzMiejscowosc_Symbol varchar(10),
+    proc_lokpraw_siedzGmina_Nazwa varchar(256), proc_lokpraw_siedzKodPocztowy varchar(7), proc_lokpraw_siedzMiejscowoscPoczty_Symbol varchar(10), proc_lokpraw_siedzMiejscowoscPoczty_Nazwa varchar(256),
+    proc_lokpraw_siedzMiejscowosc_Symbol varchar(10),
     proc_lokpraw_siedzMiejscowosc_Nazwa varchar(256), proc_lokpraw_siedzUlica_Symbol varchar(10), proc_lokpraw_siedzUlica_Nazwa varchar(256),
-    proc_lokpraw_siedzKodPocztowy varchar(7), proc_lokpraw_siedzNumerNieruchomosci varchar(10), proc_lokpraw_siedzNumerLokalu varchar(10),
+    proc_lokpraw_siedzNumerNieruchomosci varchar(10), proc_lokpraw_siedzNumerLokalu varchar(10),
     proc_lokpraw_siedzNietypoweMiejsceLokalizacji varchar(256), proc_lokpraw_formaFinansowania_Symbol varchar(10), proc_lokpraw_formaFinansowania_Nazwa varchar(256),
     proc_lokpraw_organRejestrowy_Symbol varchar(10), proc_lokpraw_organRejestrowy_Nazwa varchar(256), proc_lokpraw_rodzajRejestruEwidencji_Symbol varchar(10),
     proc_lokpraw_rodzajRejestruEwidencji_Nazwa varchar(256), proc_lokpraw_dataWpisuDoBazyDanych DATE) LANGUAGE plpgsql as $$
@@ -242,7 +243,6 @@ CREATE OR REPLACE PROCEDURE insert_into_common_LP(proc_lokpraw_regon varchar(14)
 
        end;
 $$; -- created
-
 
 CREATE OR REPLACE PROCEDURE insert_into_common_LF(
     proc_lokfiz_regon varchar(14), proc_lokfiz_nazwa varchar(256), proc_lokfiz_silosID INT, proc_lokfiz_SilosNazwa varchar(100),
@@ -320,7 +320,7 @@ LANGUAGE plpgsql AS $$
 CREATE OR REPLACE PROCEDURE insert_into_pkd_F_ownership(proc_pkdF_regon varchar(9), proc_pkdF_kod varchar(10), proc_pkdF_pkdNazwa varchar(256),
 proc_pkdF_Przewazajace INT, proc_pkdF_SilosID INT, proc_pkdF_SilosNazwa varchar(30), proc_pkdF_dataSkreslenia DATE) LANGUAGE plpgsql AS $$
     BEGIN
-    IF NOT EXISTS(SELECT * FROM pkds WHERE pkd_kod = proc_pkdF_kod) THEN
+    IF NOT EXISTS(SELECT * FROM pkds p WHERE p.pkd_kod = proc_pkdF_kod) THEN
         INSERT INTO pkds (pkd_kod, pkd_nazwa) VALUES
         (proc_pkdF_kod, proc_pkdF_pkdNazwa);
     end if;
@@ -351,7 +351,7 @@ proc_pkd_Przewazajace INT, proc_pkd_silosSymbol INT, proc_pkd_silosNazwa varchar
                                      lokfiz_pkd_przewazajace, lokfiz_silos_symbol) VALUES
         (proc_pkd_LFRegon, proc_pkd_Kod, proc_pkd_Przewazajace, proc_pkd_silosSymbol);
     end;
-    $$;
+    $$; -- created
 
 CREATE OR REPLACE PROCEDURE insert_into_pkd_LP_ownership(
 proc_LP_regon varchar(14), proc_pkd_LP_kod varchar(10), proc_pkd_LP_Nazwa varchar(256),
@@ -365,7 +365,7 @@ proc_LP_pkdPrzewazajace INT
         INSERT INTO pkd_lp_ownership (lokpraw_pkd_regon, lokpraw_pkdkod, lokpraw_pkdprzewazajace) VALUES
         (proc_LP_regon, proc_pkd_LP_kod, proc_LP_pkdPrzewazajace);
     end;
-    $$;
+    $$; -- created
 
 CREATE OR REPLACE PROCEDURE insert_into_pkd_P_ownership(
 proc_P_PkdRegon varchar(9), proc_P_pkdKod varchar(10), proc_P_pkdNazwa varchar(256),
@@ -379,7 +379,7 @@ proc_P_pkdPrzewazajace INT
         INSERT INTO pkd_p_ownership (praw_pkd_regon, praw_pkdkod, praw_pkdprzewazajace) VALUES
         (proc_P_PkdRegon, proc_P_pkdKod, proc_P_pkdPrzewazajace);
     END;
-$$;
+$$; -- created
 
 CREATE OR REPLACE PROCEDURE insert_Ceidg(
 proc_fiz_regon varchar(9),proc_fiz_nazwa varchar(256),

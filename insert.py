@@ -3,6 +3,7 @@ import traceback
 import csv
 import time
 import sys
+from os import chdir
 from datetime import date
 from abc import ABC, ABCMeta, abstractmethod
 
@@ -267,7 +268,7 @@ class local_P(local_unit):
         self.rodzaj_rejestru_ewidencji_nazwa = table_row[35]
 
     def __str__(self) -> str:
-        return "('" + self.regon + "','" + self.nazwa + "','" + self.numer_w_rejestrze_ewidencji + "','" + self.data_wpisu_rejestr_ewidencji + "','" + self.data_powstania + "','" + self.rozpoczecie_dzialalnosci + "','" + self.regon_wpis + "','" + self.zawieszenie_dzialalnosci + "','" + self.wznowienie_dzialalnosci + "','" + self.zaistnienie_zmiany + "','" + self.zakonczenie_dzialalnosci + "','" + self.skreslenie_regon + "','" + self.kraj_symbol + "','" + self.wojewodztwo_symbol + "','" + self.powiat_symbol + "','" + self.gmina_symbol + "','" + self.gmina_nazwa + "','" + self.kod_pocztowy + "','" + self.miejscowosc_poczty_symbol + "','" + self.miejscowosc_poczty_nazwa + "','" + self.miejscowosc_symbol + "','" + self.miejscowosc_nazwa + "','" + self.ulica_symbol + "','" + self.ulica_nazwa + "','" + self.numer_nieruchomosci + "','" + self.numer_lokalu + "','" + self.nietypowe_miejsce_lokalizacji + "','" + self.forma_finansowania_symbol + "','" + self.forma_finansowania_nazwa + "','" + self.data_wpisu_rejestr_ewidencji + "','" + self.numer_w_rejestrze_ewidencji + "','" + self.organ_rejestrowy_symbol + "','" + self.organ_rejestrowy_nazwa + "','" + self.rodzaj_rejestru_ewidencji_symbol + "','" + self.rodzaj_rejestru_ewidencji_nazwa + "','" + str(date.today()) + "')"
+        return "('" + self.regon + "','" + self.nazwa + "','" + self.numer_w_rejestrze_ewidencji + "','" + self.data_wpisu_rejestr_ewidencji + "','" + self.data_powstania + "','" + self.rozpoczecie_dzialalnosci + "','" + self.regon_wpis + "','" + self.zawieszenie_dzialalnosci + "','" + self.wznowienie_dzialalnosci + "','" + self.zaistnienie_zmiany + "','" + self.zakonczenie_dzialalnosci + "','" + self.skreslenie_regon + "','" + self.kraj_symbol + "','" + self.wojewodztwo_symbol + "','" + self.powiat_symbol + "','" + self.gmina_symbol + "','" + self.gmina_nazwa + "','" + self.kod_pocztowy + "','" + self.miejscowosc_poczty_symbol + "','" + self.miejscowosc_poczty_nazwa + "','" + self.miejscowosc_symbol + "','" + self.miejscowosc_nazwa + "','" + self.ulica_symbol + "','" + self.ulica_nazwa + "','" + self.numer_nieruchomosci + "','" + self.numer_lokalu + "','" + self.nietypowe_miejsce_lokalizacji + "','" + self.forma_finansowania_symbol + "','" + self.forma_finansowania_nazwa + "','" + self.organ_rejestrowy_symbol + "','" + self.organ_rejestrowy_nazwa + "','" + self.rodzaj_rejestru_ewidencji_symbol + "','" + self.rodzaj_rejestru_ewidencji_nazwa + "','" + str(date.today()) + "')"
 
 class two_column_item():
     def __init__(self, table_row):
@@ -311,6 +312,8 @@ class pkd_item(metaclass=ABCMeta):
         self.pkd_kod = table_row[1]
         self.pkd_nazwa = table_row[2]
         self.pkd_przewazajace = table_row[3]
+        if self.pkd_przewazajace == '':
+            self.pkd_przewazajace = '0'
     
     @abstractmethod
     def __str__(self) -> str:
@@ -350,10 +353,10 @@ class pkd_P_item(pkd_item):
 
 class file_handler():
     def __init__(self, file_name):
-      self.file = file_name + '.xlsx'
+      self.file = file_name
       self.exceptions_file = open('exceptions.csv', 'a')
       self.writer = csv.writer(self.exceptions_file, delimiter = ';')
-      self.writer.writerow('Regon', 'Type of raport')
+      self.writer.writerow(['Regon', 'Type of raport'])
 
     def read_rows(self):
         with open(self.file) as csv_file:
@@ -420,18 +423,18 @@ class data_inserter():
                 self.cursor.execute(command)
                 self.connection.commit()
             except Exception:
-                self.file_handler.write_exceptions(self.mode, table_row[0])
+                # self.file_handler.write_exceptions(self.mode, table_row[0])
                 traceback.print_exc()
                 self.connection.rollback()
 
 
 def main():
-    file_name = sys.argv[2].replace('.xlsx', '')
-    print('file name is ', file_name)
+    file_name = sys.argv[2]
     mode = sys.argv[1]
-    print('mode is ', mode)
-    # db = data_inserter(mode, file_name)
-    # db.data_looper()
+    print(f'mode is {mode}, file_name is {file_name}')
+    chdir(sys.argv[3])
+    db = data_inserter(mode, file_name)
+    db.data_looper()
     
 
 if __name__ == '__main__':
