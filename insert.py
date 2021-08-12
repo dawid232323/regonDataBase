@@ -2,6 +2,7 @@ import psycopg2
 import traceback
 import csv
 import time
+import sys
 from datetime import date
 from abc import ABC, ABCMeta, abstractmethod
 
@@ -349,7 +350,7 @@ class pkd_P_item(pkd_item):
 
 class file_handler():
     def __init__(self, file_name):
-      self.file = file_name
+      self.file = file_name + '.xlsx'
       self.exceptions_file = open('exceptions.csv', 'a')
       self.writer = csv.writer(self.exceptions_file, delimiter = ';')
       self.writer.writerow('Regon', 'Type of raport')
@@ -425,8 +426,12 @@ class data_inserter():
 
 
 def main():
-    db = data_inserter('CP', 'tests/common_P1.csv')
-    db.data_looper()
+    file_name = sys.argv[2].replace('.xlsx', '')
+    print('file name is ', file_name)
+    mode = sys.argv[1]
+    print('mode is ', mode)
+    # db = data_inserter(mode, file_name)
+    # db.data_looper()
     
 
 if __name__ == '__main__':
