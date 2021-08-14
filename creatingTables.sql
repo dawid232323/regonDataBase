@@ -114,7 +114,7 @@ CREATE TABLE common_P(
     CONSTRAINT fk_rodzajRejestruEwidencji_Symbol FOREIGN KEY (praw_rodzajRejestruEwidencji_SYmbol) REFERENCES type_of_register_of_records(rodzaj_rejestru_ewidencji_symbol)
     --CONSTRAINT fk_regon FOREIGN KEY (praw_regon) REFERENCES summary_data(regon)
 ); --created
-DROP TABLE common_P;
+
 
 CREATE TABLE common_F(
     id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -270,7 +270,7 @@ CREATE TABLE pkd_LF_ownership(
     lokfiz_pkd_regon varchar(14) NOT NULL,
     lokfiz_pkd_Kod varchar(10) NOT NULL,
     lokfiz_pkd_Przewazajace INT,
-    lokfiz_Silos_Symbol varchar(256),
+    lokfiz_Silos_Symbol varchar(10),
     CONSTRAINT pk_pkd_LF_ownership PRIMARY KEY (lokfiz_pkd_regon, lokfiz_pkd_Kod),
     CONSTRAINT fk_pkd_Kod FOREIGN KEY (lokfiz_pkd_Kod) REFERENCES pkds(pkd_Kod)
 ); -- created
@@ -325,7 +325,7 @@ CREATE TABLE Fizyczna_Dzialalnosc_Ceidg_i_Pozostala(
     fiz_adresStronyInternetowej varchar(35),
     fizC_dataWpisuDoRejestruEwidencji DATE,
     fizC_dataSkresleniaZRejestruEwidencji DATE,
-    fizC_numerWRejestrzeEwidencji DATE,
+    fizC_numerWRejestrzeEwidencji varchar(20),
     fizC_OrganRejestrowy_Symbol varchar(10),
     fizC_RodzajRejestru_Symbol varchar(10),
     fizC_NiePodjetoDzialalnosci varchar(15),
@@ -418,4 +418,12 @@ CREATE TABLE Fizyczne_Sreslone(
     CONSTRAINT fk_del_post FOREIGN KEY (fiz_adSiedzMiejscowoscPoczty_Symbol) REFERENCES posts(siedz_miejscowosc_poczty_symbol),
     CONSTRAINT fk_del_street FOREIGN KEY (fiz_adSiedzUlica_Symbol) REFERENCES streets(siedz_ulica_symbol)
 
-) -- created
+); -- created
+
+ALTER TABLE common_f RENAME COLUMN id TO f_id;
+ALTER TABLE fizyczna_dzialalnosc_ceidg_i_pozostala RENAME COLUMN id TO f_cdeig_rest_id;
+ALTER TABLE fizycznadzialalnoscrolnicza RENAME COLUMN id TO f_agr_id;
+ALTER TABLE fizyczne_sreslone RENAME COLUMN id to f_del_id;
+ALTER TABLE common_p RENAME COLUMN id to p_id;
+ALTER TABLE common_lp RENAME COLUMN id TO lp_id;
+ALTER TABLE common_lf RENAME COLUMN id to lp_id;

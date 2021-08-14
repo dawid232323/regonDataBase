@@ -335,21 +335,16 @@ $$; -- created
 
 CREATE OR REPLACE PROCEDURE insert_into_pkd_LF_ownership(
 proc_pkd_LFRegon varchar(14), proc_pkd_Kod varchar(10), proc_pkd_Nazwa varchar(256),
-proc_pkd_Przewazajace INT, proc_pkd_silosSymbol INT, proc_pkd_silosNazwa varchar(100)
+proc_pkd_Przewazajace INT, proc_pkd_silosNazwa varchar(100)
 ) LANGUAGE plpgsql AS $$
     BEGIN
-       IF NOT EXISTS(SELECT * FROM silos WHERE silosid = proc_pkd_silosSymbol) AND
-          proc_pkd_silosSymbol IS NOT NULL THEN
-           INSERT INTO silos (silosid, silos_nazwa) VALUES
-           (proc_pkd_silosSymbol, proc_pkd_silosNazwa);
-       end if;
        IF NOT EXISTS(SELECT * FROM pkds WHERE pkd_kod = proc_pkd_Kod) THEN
            INSERT INTO pkds (pkd_kod, pkd_nazwa) VALUES
            (proc_pkd_Kod, proc_pkd_Nazwa);
        end if;
        INSERT INTO pkd_lf_ownership (lokfiz_pkd_regon, lokfiz_pkd_kod,
                                      lokfiz_pkd_przewazajace, lokfiz_silos_symbol) VALUES
-        (proc_pkd_LFRegon, proc_pkd_Kod, proc_pkd_Przewazajace, proc_pkd_silosSymbol);
+        (proc_pkd_LFRegon, proc_pkd_Kod, proc_pkd_Przewazajace, proc_pkd_silosNazwa);
     end;
     $$; -- created
 
@@ -397,7 +392,7 @@ proc_fiz_adSiedzNumerLokalu varchar(10), proc_fiz_adSiedzNietypoweMiejsceLokaliz
 proc_fiz_numerTelefonu varchar(10), proc_fiz_numerWewnetrznyTelefonu varchar(10),
 proc_fiz_numerFaksu varchar(10), proc_fiz_adresStronyInternetowej varchar(35),
 proc_fizC_dataWpisuDoRejestruEwidencji DATE, proc_fizC_dataSkresleniaZRejestruEwidencji DATE,
-proc_fizC_numerWRejestrzeEwidencji DATE, proc_fizC_OrganRejestrowy_Symbol varchar(10),
+proc_fizC_numerWRejestrzeEwidencji varchar(20), proc_fizC_OrganRejestrowy_Symbol varchar(10),
 proc_fizC_RodzajRejestru_Symbol varchar(10), proc_fizC_NiePodjetoDzialalnosci varchar(15),
 proc_fiz_miejscowoscNazwa varchar(256),
 proc_fiz_gminaNazwa varchar(256), proc_fiz_siedzPocztyNazwa varchar(256),
@@ -445,7 +440,7 @@ proc_fiz_rodzajRejestruNazwa varchar(256)
          proc_fizC_numerWRejestrzeEwidencji, proc_fizC_OrganRejestrowy_Symbol, proc_fizC_RodzajRejestru_Symbol,
          proc_fizC_NiePodjetoDzialalnosci, 'Ceidg');
     end;
-$$;
+$$; -- created
 CREATE OR REPLACE PROCEDURE insert_Pozostale(
 proc_fiz_regon varchar(9),proc_fiz_nazwa varchar(256),
 proc_fiz_nazwaSkrocona varchar(100), proc_fiz_dataPowstania DATE,
@@ -511,7 +506,7 @@ proc_fiz_rodzajRejestruNazwa varchar(256)
     end;
 $$; -- created
 
-CREATE PROCEDURE insert_rolnicza(
+CREATE OR REPLACE PROCEDURE insert_rolnicza(
 proc_fiz_regon varchar(9), proc_fiz_nazwa varchar(256), proc_fiz_nazwa_skrocona varchar(100),
 proc_fiz_dataPowstania DATE, proc_fiz_dataRozpoczeciaDzialalnosci DATE, proc_fiz_dataWpisuDzialalnosciDoRegon DATE,
 proc_fiz_dataZawieszeniaDzialalnosci DATE, proc_fiz_dataWznowieniaDzialalnosci DATE,
