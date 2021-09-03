@@ -384,7 +384,7 @@ class data_inserter():
         self.mode = mode
         self.data_types = {'CP':'insert_into_common_P', 'CF':'insert_into_common_F', 'CLP':'insert_into_common_LP', 
         'CLF':'insert_into_common_LF', 'cdeigF':'insert_Ceidg', 'agrF':'insert_rolnicza', 'restF':'insert_Pozostale',
-        'delF':'insert_Skreslone', 'pkdP':'insert_into_pkd_P_ownership', 'pkdF':'insert_into_pkd_F_ownership', 'pkdLP': 'insert_into_pkd_LP_ownership', 'pkdLF': 'insert_into_pkd_LF_ownership'}
+        'delF':'insert_Skreslone', 'pkdP':'insert_into_pkd_P_ownership', 'pkdF':'insert_into_pkd_F_ownership', 'pkdLP': 'insert_into_pkd_LP_ownership', 'pkdLF': 'insert_into_pkd_LF_ownership', 'si':'insert_into'}
         self.file_handler = file_handler(file_name)
 
     def row_creator(self, table_row) -> str:
