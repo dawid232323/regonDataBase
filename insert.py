@@ -7,6 +7,17 @@ from os import chdir
 from datetime import date
 from abc import ABC, ABCMeta, abstractmethod
 
+class colors():
+    def __init__(self):
+        self.HEADER = '\033[95m'
+        self.OKBLUE = '\033[94m'
+        self.OKGREEN = '\033[92m'
+        self.WARNING = '\033[93m'
+        self.FAIL = '\033[91m'
+        self.ENDC = '\033[0m'
+        self.BOLD = '\033[1m'
+        self.UNDERLINE = '\033[4m'
+
 class common_item():
     def __init__(self, regon, nip, nip_status, regon_wpis, regon_zmiana, regon_skreslenie, podstawowa_forma_prawna, szczegolna_forma_prawna, forma_finansowania, forma_wlasnosci):
         self.regon = regon
@@ -364,7 +375,8 @@ class file_handler():
             for row in csv_reader:
                 yield row
     def write_exceptions(self, mode, regon): #function that will save all records that failed to insert
-        self.writer.writerow(regon, mode)
+        row = [regon, mode]
+        self.writer.writerow(row)
 
 class data_base_connector():
     def __init__(self):
@@ -422,9 +434,18 @@ class data_inserter():
             try:
                 self.cursor.execute(command)
                 self.connection.commit()
+            except psycopg2.OperationalError:
+                print(colors().FAIL, 'Operational error occured, do you wish to continue?')
+                wish = input('y/n', colors().ENDC)
+                if wish == 'y':
+                    continue
+                else:
+                    print('Last command was\n', command)
+                    break
             except Exception:
-                # self.file_handler.write_exceptions(self.mode, table_row[0])
-                traceback.print_exc()
+                self.file_handler.write_exceptions(self.mode, table_row[0])
+                print(colors().FAIL, 'fail with ', table_row[0], ' and mode ', self.mode, colors().ENDC)
+                time.sleep(2)
                 self.connection.rollback()
 
 
