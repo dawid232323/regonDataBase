@@ -53,15 +53,13 @@ CREATE OR REPLACE VIEW F_deleted_View AS
         fs.fiz_datazakonczeniadzialalnosci, fs.fiz_dataskresleniadzialalnoscizregon, c.siedz_kraj_nazwa, st.siedz_wojewodztwa_nazwa,
         c2.siedz_powiat_nazwa, m.siedz_gmina_nazwa, fs.fiz_adsiedzkodpocztowy, p.siedz_miejscowosc_poczty_nazwa, s.siedz_ulica_nazwa,
         fs.fiz_adsiedznumernieruchomosci, fs.fiz_adsiedznumerlokalu, fs.fiz_adsiedznietypowemiejscelokalizacji, fs.fiz_numertelefonu, fs.fiz_numerwewnetrznytelefonu,
-        fs.fiz_numerfaksu, fs.fiz_adresstronyinternetowej, fs.fiz_adresemail2, pkds.pkd_nazwa, CASE WHEN pkdF.fiz_pkd_przewazajace = 1 THEN True
-        WHEN pkdF.fiz_pkd_przewazajace = 0 THEN FALSE END pkd_przewazajace
+        fs.fiz_numerfaksu, fs.fiz_adresstronyinternetowej, fs.fiz_adresemail2
         FROM common_f cmf JOIN fizyczne_sreslone fs ON cmf.fiz_regon = fs.fiz_regon JOIN countries c on fs.fiz_adsiedzkraj_symbol = c.siedz_kraj_symbol
         JOIN states st ON st.siedz_wojewodztwa_symbol = fs.fiz_adsiedzwojewodztwo_symbol JOIN counties c2 on fs.fiz_adsiedzpowiat_symbol = c2.siedz_powiat_symbol
         JOIN municipalities m on fs.fiz_adsiedzgmina_symbol = m.siedz_gmina_symbol JOIN posts p on fs.fiz_adsiedzmiejscowoscpoczty_symbol = p.siedz_miejscowosc_poczty_symbol
         JOIN streets s on fs.fiz_adsiedzulica_symbol = s.siedz_ulica_symbol LEFT OUTER JOIN basic_legal_form blf on cmf.fiz_podstawowaformaprawna_symbol = blf.podstawowa_forma_prawna_symbol
         LEFT OUTER JOIN specific_legal_form slf on cmf.fiz_szczegolnaformaprawna_symbol = slf.szczegolna_forma_prawna_symbol LEFT OUTER JOIN forms_of_financing fof on cmf.fiz_formafinansowania_symbol = fof.forma_finansowania_symbol
         LEFT OUTER JOIN forms_of_ownership foo on cmf.fiz_formawlasnosci_symbol = foo.forma_wlasnosci_symbol JOIN silos s2 on cmf.fiz_dzialanoscceidg = s2.silosid
-        JOIN pkd_f_ownership pkdF ON pkdF.fiz_pkd_regon  = fs.fiz_regon JOIN pkds on pkdF.fiz_pkd_kod = pkds.pkd_kod;
 
 CREATE OR REPLACE VIEW common_P_view AS
     SELECT praw_regon, praw_nip, praw_statusnip, praw_nazwa, praw_nazwaskrocona, praw_numerwrejestrzeewidencji, praw_datawpisudorejestruewidencji,
@@ -81,6 +79,8 @@ CREATE OR REPLACE VIEW common_P_view AS
     LEFT OUTER JOIN type_of_register_of_records toror on cp.praw_rodzajrejestruewidencji_symbol = toror.rodzaj_rejestru_ewidencji_symbol LEFT OUTER JOIN pkd_p_ownership pkdP ON pkdP.praw_pkd_regon = cp.praw_regon
     JOIN pkds p2 on pkdP.praw_pkdkod = p2.pkd_kod;
 
+SELECT * FROM common_P_view;
+
 CREATE OR REPLACE VIEW local_P_view AS -- common lp with pkds joined
     SELECT lokpraw_regon, lokpraw_parentregon, lokpraw_nazwa, lokpraw_numerwrejestrzeewiddencji, lokpraw_datawpisudorejestruewidencji,
            lokpraw_datapowstania, lokpraw_datarozpoczeciadzialalnosci, lokpraw_datawpisudoregon, lokpraw_datazawieszeniadzialanosci, lokpraw_datawznowieniadzialanosci,
@@ -98,6 +98,22 @@ CREATE OR REPLACE VIEW local_P_view AS -- common lp with pkds joined
 
 --TODO create common_lf joined with pkds view fix common_f deleted
 
+CREATE OR REPLACE VIEW local_F_view AS -- common lf joined with pkd etc
+    SELECT lokfiz_regon, lokfiz_parentregon, lokfiz_nazwa, s.silos_nazwa, lokfiz_datapowstania, lokfiz_datarozpoczeciadzialalnosci, lokfiz_datawpisudoregon,
+           lokfiz_datazawieszeniadzialanosci, lokfiz_datawznowieniadzialanosci, lokfiz_datazaistnieniazmiany, lokfizdatazakonczeniadzialanosci, lokfiz_dataskresleniazregon,
+           c.siedz_kraj_nazwa, s2.siedz_wojewodztwa_nazwa, c2.siedz_powiat_nazwa, m.siedz_gmina_nazwa, lokfiz_siedzkodpocztowy, p.siedz_miejscowosc_poczty_nazwa,
+           t.siedz_miejscowosc_nazwa, s3.siedz_ulica_nazwa, lokfiz_siedznumernieruchomosci, lokfiz_siedznumerlokalu, lokfiz_siedznietypowemiejscelokalizacji,
+           fof.forma_finansowania_nazwa, lokfiz_datawpisudorejestruewidencji, lokfiz_numerwrejestrzeewidencji, ra.organ_rejestrowy_nazwa, rt.rodzajrejestru_nazwa,
+           lokfizc_niepodjetodzialanosci, lokfiz_datawpisudobazydanych, pkds.pkd_nazwa, CASE WHEN pkdLF.lokfiz_pkd_przewazajace = 1 THEN TRUE
+           WHEN pkdLF.lokfiz_pkd_przewazajace = 0 THEN FALSE END pkd_przewazajace
+           FROM common_lf JOIN silos s on common_lf.lokfiz_silosid = s.silosid JOIN countries c on common_lf.lofkiz_siedzkraj_symbol = c.siedz_kraj_symbol
+           JOIN states s2 on common_lf.lokfiz_siedzwojewodztwo_symbol = s2.siedz_wojewodztwa_symbol JOIN counties c2 on common_lf.lokfiz_siedzpowiat_symbol = c2.siedz_powiat_symbol
+           JOIN municipalities m on common_lf.lokfiz_siedzgmina_symbol = m.siedz_gmina_symbol JOIN posts p ON common_lf.lokfiz_siedzmiejscowoscpoczty_symbol = p.siedz_miejscowosc_poczty_symbol
+           JOIN towns t on common_lf.lokfiz_siedzmiejscowosc_symbol = t.siedz_miejscowosc_symbol JOIN streets s3 on common_lf.lokfiz_siedzulica_symbol = s3.siedz_ulica_symbol
+           LEFT OUTER JOIN forms_of_financing fof on common_lf.lokfiz_formafinansowania_symbol = fof.forma_finansowania_symbol LEFT OUTER JOIN registration_authorities ra on common_lf.lokfiz_organrejestrowy_symbol = ra.organ_rejestrowy_symbol
+           LEFT OUTER JOIN register_types rt on common_lf.lokfiz_rodzajrejestru_symbol = rt.rodzajrejestru_symbol JOIN pkd_lf_ownership pkdLF ON pkdLF.lokfiz_pkd_regon = lokfiz_regon
+           JOIN pkds ON pkdLF.lokfiz_pkd_kod = pkds.pkd_kod;
+
 
 SELECT * FROM fizyczna_dzialalnosc_ceidg_i_pozostala;
 SELECT count(*) FROM fizycznadzialalnoscrolnicza;
@@ -108,6 +124,7 @@ SELECT * FROM pkd_p_ownership;
 SELECT count(*) FROM common_P_view;
 SELECT count(*) FROM common_p JOIN pkd_p_ownership ON common_p.praw_regon = pkd_p_ownership.praw_pkd_regon;
 SELECT common_P.* FROM common_p LEFT OUTER JOIN common_P_view ON common_P_view.praw_regon = common_p.praw_regon WHERE common_P_view.praw_regon IS NULL;
-SELECT * FROM common_lp;
+SELECT * FROM common_lf;
 SELECT * FROM F_CDEIG_rest_view WHERE rodzajDzialalnosci != 'Cdeig';
-
+SELECT * FROM common_f WHERE fiz_dzialanoscskreslonado20141108 = 4;
+SELECT fiz_regon FROM common_f EXCEPT SELECT fiz_regon FROM fizyczne_sreslone;
