@@ -11,3 +11,4 @@ file = open('test.csv', mode='a')
 writer = csv.writer(file, delimiter=';')
 row = ['raz', 'dwa', 'trzy']
 writer.writerow(row)
+

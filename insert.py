@@ -3,11 +3,12 @@ import traceback
 import csv
 import time
 import sys
+import os.path
 from os import chdir
 from datetime import date
 from abc import ABC, ABCMeta, abstractmethod
 
-class colors():
+class colors(): #color class used with printing errors 
     def __init__(self):
         self.HEADER = '\033[95m'
         self.OKBLUE = '\033[94m'
@@ -362,23 +363,27 @@ class pkd_P_item(pkd_item):
     def __str__(self) -> str:
         return super().__str__() + ")"
 
-class file_handler():
+class file_handler(): #class that opens and reads data from files 
     def __init__(self, file_name):
-      self.file = file_name
-      self.exceptions_file = open('exceptions.csv', 'a')
-      self.writer = csv.writer(self.exceptions_file, delimiter = ';')
-      self.writer.writerow(['Regon', 'Type of raport'])
+      self.file = file_name #name of the file to read
+      if os.path.isfile('exceptions.txt'):
+        self.exceptions_file = open('exceptions.csv', 'a') #opened file with inserting exceptions in append mode 
+        self.writer = csv.writer(self.exceptions_file, delimiter = ';') #csv writer
+      else: #if exceptions.txt does not already exist file is created 
+        self.exceptions_file = open('exceptions.csv', 'w') #opened file with inserting exceptions
+        self.writer = csv.writer(self.exceptions_file, delimiter = ';') #csv writer
+        self.writer.writerow(['Regon', 'Type of raport', 'Used command']) #writing header row to exceptions file 
 
-    def read_rows(self):
+    def read_rows(self): #function to read rows from file 
         with open(self.file) as csv_file:
-            csv_reader = csv.reader(csv_file, delimiter = ';')
+            csv_reader = csv.reader(csv_file, delimiter = ';') #creating an csv reader
             for row in csv_reader:
                 yield row
-    def write_exceptions(self, mode, regon): #function that will save all records that failed to insert
-        row = [regon, mode]
+    def write_exceptions(self, mode, regon, command): #function that will save all records that failed to insert
+        row = [regon, mode, command]
         self.writer.writerow(row)
 
-class data_base_connector():
+class data_base_connector(): #class that connects to the data base
     def __init__(self):
         try:
             self.conn = psycopg2.connect(host = 'localhost', database = 'p1495_regon_base', user = 'p1495_regon_base', password= 'R!(gR(A2pEyOj(8N5iZN', port = 8543)
@@ -388,18 +393,18 @@ class data_base_connector():
             traceback.print_exc()
         
     def get_conn_details(self):
-        return self.conn, self.cur
+        return self.conn, self.cur #function that returns connection details 
 
-class data_inserter():
+class data_inserter(): #main class that inserts data 
     def __init__(self, mode, file_name):
         self.connection, self.cursor = data_base_connector().get_conn_details()
         self.mode = mode
         self.data_types = {'CP':'insert_into_common_P', 'CF':'insert_into_common_F', 'CLP':'insert_into_common_LP', 
         'CLF':'insert_into_common_LF', 'cdeigF':'insert_Ceidg', 'agrF':'insert_rolnicza', 'restF':'insert_Pozostale',
-        'delF':'insert_Skreslone', 'pkdP':'insert_into_pkd_P_ownership', 'pkdF':'insert_into_pkd_F_ownership', 'pkdLP': 'insert_into_pkd_LP_ownership', 'pkdLF': 'insert_into_pkd_LF_ownership', 'si':'insert_into'}
+        'delF':'insert_Skreslone', 'pkdP':'insert_into_pkd_P_ownership', 'pkdF':'insert_into_pkd_F_ownership', 'pkdLP': 'insert_into_pkd_LP_ownership', 'pkdLF': 'insert_into_pkd_LF_ownership', 'si':'insert_into'} #dictionary with prefixes of the inserting statement depending on the raport type that is passed as an argument to the programme 
         self.file_handler = file_handler(file_name)
 
-    def row_creator(self, table_row) -> str:
+    def row_creator(self, table_row) -> str: #function that takes as an argument a row from the csv file with all the data, and returns it as a string with empty fields replaced with null 
         if self.mode == 'CP':
             return str(common_P_item(table_row)).replace("''", 'NULL')
         elif self.mode == 'CF':
@@ -425,24 +430,24 @@ class data_inserter():
         elif self.mode == 'pkdLF':
             return str(pkd_LF_item(table_row)).replace("''", 'NULL')
 
-    def data_looper(self):
-        title = next(self.file_handler.read_rows())
-        for table_row in self.file_handler.read_rows():
+    def data_looper(self): #function that inserts data 
+        title = next(self.file_handler.read_rows()) #document table header
+        for table_row in self.file_handler.read_rows(): #loop that iterates through the file rows 
             row = self.row_creator(table_row)
-            command = 'CALL ' + self.data_types[self.mode] + row
+            command = 'CALL ' + self.data_types[self.mode] + row #command that is called in the sql server 
             print(command)
-            try:
+            try: #inserting 
                 self.cursor.execute(command)
                 self.connection.commit()
-            except psycopg2.OperationalError:
+            except psycopg2.OperationalError: #error of disconnetcion (mainly)
                 print(colors().FAIL, 'Operational error occured, do you wish to continue?')
-                wish = input('y/n', colors().ENDC)
+                wish = input('y/n ', colors().ENDC)
                 if wish == 'y':
                     continue
                 else:
-                    print('Last command was\n', command)
+                    print(colors().WARNING, 'Last command was\n', command, colors().ENDC)
                     break
-            except Exception:
+            except Exception: #any other exception 
                 self.file_handler.write_exceptions(self.mode, table_row[0])
                 print(colors().FAIL, 'fail with ', table_row[0], ' and mode ', self.mode, colors().ENDC)
                 time.sleep(2)
