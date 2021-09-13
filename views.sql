@@ -43,7 +43,7 @@ CREATE OR REPLACE VIEW F_agriculture_view AS -- joined common f with f_agricultu
         LEFT OUTER JOIN forms_of_financing fof on cmf.fiz_formafinansowania_symbol = fof.forma_finansowania_symbol LEFT OUTER JOIN forms_of_ownership foo on cmf.fiz_formawlasnosci_symbol = foo.forma_wlasnosci_symbol
         JOIN pkd_f_ownership pkdF ON cmf.fiz_regon = pkdF.fiz_pkd_regon JOIN pkds ON pkdF.fiz_pkd_kod = pkds.pkd_kod;
 
-CREATE OR REPLACE VIEW F_deleted_View AS
+CREATE OR REPLACE VIEW F_deleted_View AS -- joined common f with deleted, states, countires etc. (without pkds)
     SELECT cmf.f_id, cmf.fiz_regon, cmf.fiz_nip, cmf.fiz_statusnip,
         cmf.fiz_nazwisko, cmf.fiz_imie1, cmf.fiz_imie2, cmf.fiz_datawpisupodmiotudoregon, cmf.fiz_datazaistnieniazmiany,
         cmf.fiz_dataskresleniapodmiotuzregon, blf.podstawowa_forma_prawna_nazwa, slf.szeczgolna_forma_prawna_nazwa,
@@ -54,14 +54,14 @@ CREATE OR REPLACE VIEW F_deleted_View AS
         c2.siedz_powiat_nazwa, m.siedz_gmina_nazwa, fs.fiz_adsiedzkodpocztowy, p.siedz_miejscowosc_poczty_nazwa, s.siedz_ulica_nazwa,
         fs.fiz_adsiedznumernieruchomosci, fs.fiz_adsiedznumerlokalu, fs.fiz_adsiedznietypowemiejscelokalizacji, fs.fiz_numertelefonu, fs.fiz_numerwewnetrznytelefonu,
         fs.fiz_numerfaksu, fs.fiz_adresstronyinternetowej, fs.fiz_adresemail2
-        FROM common_f cmf JOIN fizyczne_sreslone fs ON cmf.fiz_regon = fs.fiz_regon JOIN countries c on fs.fiz_adsiedzkraj_symbol = c.siedz_kraj_symbol
+        FROM common_f cmf JOIN fizyczne_sreslone fs ON cmf.fiz_regon = fs.fiz_regon LEFT OUTER JOIN countries c on fs.fiz_adsiedzkraj_symbol = c.siedz_kraj_symbol
         JOIN states st ON st.siedz_wojewodztwa_symbol = fs.fiz_adsiedzwojewodztwo_symbol JOIN counties c2 on fs.fiz_adsiedzpowiat_symbol = c2.siedz_powiat_symbol
         JOIN municipalities m on fs.fiz_adsiedzgmina_symbol = m.siedz_gmina_symbol JOIN posts p on fs.fiz_adsiedzmiejscowoscpoczty_symbol = p.siedz_miejscowosc_poczty_symbol
         JOIN streets s on fs.fiz_adsiedzulica_symbol = s.siedz_ulica_symbol LEFT OUTER JOIN basic_legal_form blf on cmf.fiz_podstawowaformaprawna_symbol = blf.podstawowa_forma_prawna_symbol
         LEFT OUTER JOIN specific_legal_form slf on cmf.fiz_szczegolnaformaprawna_symbol = slf.szczegolna_forma_prawna_symbol LEFT OUTER JOIN forms_of_financing fof on cmf.fiz_formafinansowania_symbol = fof.forma_finansowania_symbol
-        LEFT OUTER JOIN forms_of_ownership foo on cmf.fiz_formawlasnosci_symbol = foo.forma_wlasnosci_symbol JOIN silos s2 on cmf.fiz_dzialanoscceidg = s2.silosid
+        LEFT OUTER JOIN forms_of_ownership foo on cmf.fiz_formawlasnosci_symbol = foo.forma_wlasnosci_symbol JOIN silos s2 on cmf.fiz_dzialanoscceidg = s2.silosid;
 
-CREATE OR REPLACE VIEW common_P_view AS
+CREATE OR REPLACE VIEW common_P_view AS -- joined common p with pkds, states, streets, founding bodies etc.
     SELECT praw_regon, praw_nip, praw_statusnip, praw_nazwa, praw_nazwaskrocona, praw_numerwrejestrzeewidencji, praw_datawpisudorejestruewidencji,
            praw_datapowstamia, praw_datarozpoczeciadzialanosci, praw_datawpisudoregon, praw_datazawieszeniadzialanosci, praw_datazaistnieniazmiany,
            praw_datazakonczeniadzialanosci, praw_dataskresleniazregon, praw_dataorzeczeniaoupadlosci, praw_datazakonczeniapostepowaniaupadlosciowego,
@@ -96,7 +96,7 @@ CREATE OR REPLACE VIEW local_P_view AS -- common lp with pkds joined
         LEFT OUTER JOIN registration_authorities ra on common_lp.lokpraw_organrejestrowy_symbol = ra.organ_rejestrowy_symbol LEFT OUTER JOIN type_of_register_of_records toror on common_lp.lokpraw_rodzajrejestruewidencji_symbol = toror.rodzaj_rejestru_ewidencji_symbol
         JOIN pkd_lp_ownership pkdLP ON pkdLP.lokpraw_pkd_regon = lokpraw_regon JOIN pkds p2 on pkdLP.lokpraw_pkdkod = p2.pkd_kod;
 
---TODO create common_lf joined with pkds view fix common_f deleted
+
 
 CREATE OR REPLACE VIEW local_F_view AS -- common lf joined with pkd etc
     SELECT lokfiz_regon, lokfiz_parentregon, lokfiz_nazwa, s.silos_nazwa, lokfiz_datapowstania, lokfiz_datarozpoczeciadzialalnosci, lokfiz_datawpisudoregon,
@@ -114,17 +114,13 @@ CREATE OR REPLACE VIEW local_F_view AS -- common lf joined with pkd etc
            LEFT OUTER JOIN register_types rt on common_lf.lokfiz_rodzajrejestru_symbol = rt.rodzajrejestru_symbol JOIN pkd_lf_ownership pkdLF ON pkdLF.lokfiz_pkd_regon = lokfiz_regon
            JOIN pkds ON pkdLF.lokfiz_pkd_kod = pkds.pkd_kod;
 
-
-SELECT * FROM fizyczna_dzialalnosc_ceidg_i_pozostala;
-SELECT count(*) FROM fizycznadzialalnoscrolnicza;
-SELECT count(*) FROM common_p;
-SELECT * FROM pkd_f_ownership;
-SELECT * FROM fizyczne_sreslone;
-SELECT * FROM pkd_p_ownership;
-SELECT count(*) FROM common_P_view;
-SELECT count(*) FROM common_p JOIN pkd_p_ownership ON common_p.praw_regon = pkd_p_ownership.praw_pkd_regon;
-SELECT common_P.* FROM common_p LEFT OUTER JOIN common_P_view ON common_P_view.praw_regon = common_p.praw_regon WHERE common_P_view.praw_regon IS NULL;
-SELECT * FROM common_lf;
-SELECT * FROM F_CDEIG_rest_view WHERE rodzajDzialalnosci != 'Cdeig';
-SELECT * FROM common_f WHERE fiz_dzialanoscskreslonado20141108 = 4;
-SELECT fiz_regon FROM common_f EXCEPT SELECT fiz_regon FROM fizyczne_sreslone;
+SELECT * FROM F_CDEIG_rest_view;
+SELECT * FROM F_agriculture_view;
+SELECT * FROM F_deleted_View;
+SELECT * FROM common_P_view;
+SELECT * FROM local_P_view;
+SELECT * FROM local_F_view;
+SELECT * FROM local_P_view lpv JOIN common_P_view cpv ON cpv.praw_regon = lpv.lokpraw_parentregon;
+SELECT * FROM local_F_view lfv JOIN F_CDEIG_rest_view FCrv on lfv.lokfiz_parentregon = FCrv.fiz_regon;
+SELECT * FROM local_F_view lfv JOIN F_agriculture_view fav ON lfv.lokfiz_parentregon = fav.fiz_regon;
+SELECT * FROM local_F_view lfv JOIN F_deleted_View fdv ON lfv.lokfiz_parentregon = fdv.fiz_regon;
