@@ -8,6 +8,12 @@ from os import chdir
 from datetime import date
 from abc import ABC, ABCMeta, abstractmethod
 
+"""
+
+Programme that reads from csv file and calls specific procedure to insert data into database 
+
+"""
+
 class colors(): #color class used with printing errors 
     def __init__(self):
         self.HEADER = '\033[95m'

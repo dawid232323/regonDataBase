@@ -2,13 +2,19 @@ from insert import colors
 import pandas as pd
 import os, sys
 
+"""
+
+Programme that converts xlsx fles to csv
+
+"""
+
 class converter():
-    def __init__(self, directory_path): #class that takes path to the dircetory with files to convert 
-        self.file_list = os.listdir(directory_path) #list of the files in direcotry 
+    def __init__(self, directory_path): # class that takes path to the dircetory with files to convert 
+        self.file_list = os.listdir(directory_path) # list of the files in direcotry 
         os.chdir(directory_path)
         self.directory_path = directory_path 
 
-    def convert(self): #function that actually converts all xlsx file in direcotry_path to csv
+    def convert(self): # function that actually converts all xlsx file in direcotry_path to csv
         for file_name in self.file_list:
             if file_name.endswith('.xlsx'):
                 print('making ', file_name)
